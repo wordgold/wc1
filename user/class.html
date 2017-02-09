@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>我的课程</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="myclass" class="ng-init">
+	<!--#include virtual="/include/nav.html"-->
+	<div class="clist panel" ng-if="rt.type==nlist[0].type&&list.length">
+		<a class="li" ng-repeat="s in list" ng-href="<!--#echo var="wc1"-->class/class.html?mid={{s.major_id}}&cid={{s.course_id}}&gid={{s.id}}">
+			<img ng-src="{{s.imgurl}}">
+			{{s.name|slice:14}} <br>
+			<span class="gray">{{s.content|slice:18}}</span><br>
+			<span class="gray">{{s.vnums||0}}课时</span><b class="orange">￥{{s.cmoney}}</b>
+		</a>
+	</div>
+	<!--#include virtual="/include/pagination.html"-->
+	<div class="none gray" ng-show="!loading&&!list.length">
+		您目前还未报名参加任何课程<br>
+		现在您可以点击下方按钮
+		<a href="<!--#echo var="wc1"-->class/list.html" class="b_btn red">选购课程</a>
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

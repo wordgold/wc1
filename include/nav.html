@@ -1,0 +1,3 @@
+<nav class="panel">
+	<a ng-repeat="n in nlist" ng-href="{{n.href}}" ng-click="setType(n.type)" ng-class="{'on':rt.type==n.type}">{{n.name}}</a>
+</nav>

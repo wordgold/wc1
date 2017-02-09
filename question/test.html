@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>微信</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="test" class="ng-init">
+	<div ng-if="!started">
+		<h2 class="panel">{{rt.name}}</h2>
+		<div class="r_panel test_info">
+			<span>试卷类型：{{info.types}}</span>
+			<span>试卷题量：{{info.total}}</span>
+			<span>考试时长：{{info.times}} 分钟</span>
+			<span>及格/总分：{{info.qualified_point}}/{{info.all_point}}</span>
+		</div>
+		<div class="btns">
+			<label class="b_btn blue" ng-click="start(false)">练习模式</label>
+			<label class="b_btn red" ng-click="start(true)">计时开始</label>
+		</div>
+		<div class="r_panel">
+			<h3 class="h3"><i class="i_book"></i>试卷详情</h3>
+			<div class="test_t" ng-if="!started" ng-bind-html="html(info.info)"></div>
+		</div>
+	</div>
+	<div ng-show="started" style="padding: 0 0 64px 0">
+		<div class="loading" ng-if="!geted"></div>
+		<div class="panel" ng-show="geted">
+			<h3 class="h3">{{ti | xyz}}. {{t.question_type_name}} <span class="fr gray">{{si+1}}/{{t.question.length}}</span></h3>
+			<div ng-bind-html="html(si+1+'. '+s.question)" class="q_header"></div>
+			<label class="answer" ng-repeat="a in s.options" ng-click="goVote(s,a.id)" ng-class="{'on':vote(s.checked,a.id,s.question_type_id),'submited':submited,'real':a.is_real}">
+				<span>{{$index | abcd}}</span>
+				<p>{{a.answer}} <img ng-if="a.answer_url" ng-src="{{a.answer_url}}"></p>
+			</label>
+			<div class="test_nav">
+				<label ng-click="prev()"><i ng-if="ti||si" class="i_left"></i></label>
+				<label ng-if="rt.type==QType[0].type" ng-click="changeFav(s)"><i ng-if="!s.colled" class="i_fav"></i><i ng-if="s.colled" class="i_fav_h"></i> 收藏</label>
+				<label ng-if="showBtn&&!submited" ng-click="s.showA=!s.showA"><i class="i_light"></i> 解析</label>
+				<label ng-if="!showBtn" ng-click="changeTime()" class="fr"><i ng-if="time_stoped&&!submited" class="i_play"></i><i ng-if="!time_stoped&&!submited" class="i_pause"></i> {{time}}</label>
+				<label ng-click="viewCard()"><i class="i_apps"></i> 答题卡</label>
+				<label ng-click="next()"><i class="i_right"></i></label>
+			</div>
+		</div>
+		<div ng-if="s.showA||submited" class="q_footer panel">
+			<h3 class="h3" ng-if="t.question_type_id<3">
+				参考答案：
+				<span class="green" ng-repeat="a in s.options" ng-if="a.is_real">{{$index | abcd}}</span>
+				<span class="gray fr">统计全平台正确率为 {{pen(s.answer_right,s.answer_num)}}</span>
+			</h3>
+			<div class="q_footer_a" ng-if="s.analysis.analysis" ng-bind-html="html('<span>参考解析：</span>'+s.analysis.analysis)">
+			</div>
+		</div>
+		<div ng-show="time_stoped" class="alert">
+			<div class="r_panel" ng-show="!card_show&&!time_end">
+				<h4>答题暂停中</h4>
+				<label class="b_btn blue" ng-click="timePlay()"><i class="icon i_play"></i> 继续答题</label>
+			</div>
+			<div class="r_panel" ng-show="card_show&&!submit_show">
+				<div class="card max_h">
+					<div ng-repeat="t in list">
+						<h3 class="h3" ng-click="scroll('ttp'+t.question_type_id)">{{$index | xyz}}. {{t.question_type_name}}</h3>
+						<label ng-repeat="s in t.question" class="{{s.yesno}}" ng-class="{'on':s.checked,'submited':submited}" ng-click="go($parent.$index,$index)">{{$index+1}}</label>
+					</div>
+				</div>
+				<span class="i_score" ng-if="submited">{{score}}</span>
+				<div class="btns"><label class="b_btn" ng-click="viewCard()">关闭答题卡</label><label ng-if="!submited" class="b_btn red" ng-click="$parent.submit_show=true"><i class="icon i_done_all"></i> 提交试卷</label></div>
+			</div>
+			<div class="r_panel" ng-show="submit_show">
+				<h4>确认提交试卷？</h4>
+				<div class="btns" ng-click="submit_show=false"><label class="b_btn"><i class="icon i_left"></i> 返回答题卡</label><label class="b_btn red" ng-click="submit()"><i class="icon i_done_all"></i> 确认提交</label></div>
+			</div>
+			<div class="r_panel" ng-show="time_end">
+				<h4>考试时间已到<br>请点击下方按钮</h4>
+				<label class="b_btn red" ng-click="time_end=false||submit()"><i class="icon i_done_all"></i> 提交试卷</label>
+			</div>
+		</div>
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

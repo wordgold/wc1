@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>班级详情</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="item" class="ng-init">
+	<div class="no_class" ng-if="!grade_name">
+		课程即将开始，请耐心等待……
+		<a href="<!--#echo var="wc1"-->class/list.html" class="b_btn red">查看其他班次</a>
+	</div>
+	<div ng-if="grade_name">
+		<video ng-src="{{video}}" class="video" controls preload autoplay></video>
+		<!--#include virtual="/include/nav.html"-->
+		<div class="panel" ng-show="rt.type<3">
+			<h3 class="h3"><i class="i_video"></i>{{grade_name}} <b class="fr red">￥{{info.cmoney}}</b></h3>
+			<ul class="data" ng-show="rt.type==1">
+				<li><span class="fl">授课教师：</span>{{techers}}</li>
+				<li><span class="fl">课&ensp;&ensp;&ensp;&ensp;时：</span>{{info.vnums||'0'}}课时</li>
+				<li><span class="fl">课程特色：</span>{{info.content}}</li>
+				<!-- <li><span class="fl">优惠政策：</span>优惠政策优惠政策优惠政策</li> -->
+			</ul>
+			<ul class="clist" ng-show="rt.type==2">
+				<li ng-repeat="v in vlist" ng-click="getVideo(v.id)"><u></u>{{v.name}}
+					<i class="i_pause red" ng-if="v.id==rt.vid"></i>
+					<i class="i_play" ng-if="!v.is_free&&v.id!=rt.vid"></i>
+					<i class="i_lock" ng-if="v.is_free&&v.id!=rt.vid"></i>
+				</li>
+			</ul>
+		</div>
+		<div class="panel comment" ng-show="rt.type==3">
+			<h3 class="h3"><i class="i_star red"></i><i class="i_star red"></i><i class="i_star red"></i><i class="i_star red"></i><i class="i_star grayish"></i><span class="red">4.{{random}} 分</span> <a href="javascript:" ng-click="post=true" class="fr">立即评价<i class="i_right"></i></a></h3>
+			<ul class="plist">
+				<li class="li" ng-repeat="c in clist">
+					<img ng-src="{{c.logo||'<!--#echo var="wc1"-->images/avatar.png'}}" class="avatar">
+					<h4 class="gray">{{c.nickname||'网友'}} <span class="fr">{{c.thistime}}</span></h4>
+					<p>{{c.content}}</p>
+				</li>
+			</ul>
+		</div>
+		<div ng-show="post" class="alert">
+			<form class="form r_panel" ng-submit="sub()" name="form" autocomplete="off">
+				<ul>
+					<li class="li">
+						<label for="nickname" class="f_i">评分</label>
+						<div><i class="i_star" ng-repeat="i in stars" ng-click="$parent.star=i" ng-class="{'red':star>$index,'grayish':star<i}"></i></div></li>
+					<li class="li">
+						<textarea class="txt" name="comment" ng-model="comment" required placeholder="请输入评价内容"></textarea></li>
+					<li class="li red" ng-show="errMsg">{{errMsg}}</li>
+				</ul>
+				<div class="btns">
+					<label class="b_btn" ng-click="post=false">关 闭</label>
+					<label class="red b_btn"><button type="submit" ng-disabled="form.$invalid">发表评价</button></label>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

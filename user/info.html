@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>个人资料</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="info" class="ng-init">
+	<form class="form" ng-submit="sub()" name="user" novalidate autocomplete="off">
+		<ul class="panel disabled">
+			<li class="li">
+				<label for="phone" class="f_i">头像</label><img class="avatar" ng-src="{{avatar||'<!--#echo var="wc1"-->images/avatar.png'}}"></li>
+			<li class="li">
+				<label for="phone" class="f_i">手机号</label>
+				<input id="phone" type="text" class="txt" disabled ng-model="phone" name="phone"></li>
+		</ul>
+		<ul class="panel">
+			<li class="li">
+				<label for="nickname" class="f_i"><big class="red">*</big>昵称</label>
+				<input id="nickname" type="text" class="txt" ng-model="nickname" name="nickname" required placeholder="请输入昵称"></li>
+			<li class="li">
+				<label for="name" class="f_i"><big class="red">*</big>真实姓名</label>
+				<input id="name" type="text" class="txt" ng-model="name" name="name" required placeholder="请输入真实姓名"></li>
+			<li class="li">
+				<label for="pid" class="f_i">所在地区</label>
+				<select id="pid" class="txt" name="pid" ng-model="pid" ng-options="p.id as p.province_name for p in plist">
+				</select></li>
+		</ul>
+		<a href="javascript:" class="red b_btn"><button type="submit" ng-disabled="user.$invalid">提交修改</button></a>
+	</form>
+	<div ng-show="errMsg" class="alert">
+		<div class="r_panel">
+			<h4>{{errMsg}}</h4>
+		</div>
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

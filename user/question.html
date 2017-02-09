@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>我的错题</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="wrong" class="ng-init">
+	<!--#include virtual="/include/nav.html"-->
+	<ul class="qtnlist panel" ng-if="list.length">
+		<li class="li" ng-repeat="s in list">
+			<label class="t" ng-click="show(s)" ng-bind-html="html(s.question.question)"></label>
+			<label ng-click="delStudy(s.qid)"><i class="i_trash"></i></label>
+			<label ng-show="s.question.colled" ng-click="delStar(s.question)"><i class="i_fav_h"></i></label>
+			<label ng-show="rt.type==1&&!s.question.colled" ng-click="addStar(s.question)"><i class="i_fav"></i></label>
+		</li>
+	</ul>
+	<!--#include virtual="/include/pagination.html"-->
+	<div class="none gray" ng-show="!loading&&!list.length">
+		很抱歉，暂无相关内容
+	</div>
+	<div ng-show="card" class="alert">
+		<div class="r_panel">
+			<div class="max_h">
+				<div ng-bind-html="html(s.question)" class="q_header"></div>
+				<label class="answer submited" ng-repeat="a in s.options" ng-click="goVote(s,a.id)" ng-class="{'on':vote(s.checked,a.id,s.question_type_id),'real':a.is_real}">
+					<span>{{$index | abcd}}</span>
+					<p>{{a.answer}} <img ng-if="a.answer_url" ng-src="{{a.answer_url}}"></p>
+				</label>
+				<div class="q_footer">
+					<h3 class="h3">
+						参考答案：
+						<span class="green" ng-repeat="a in s.options" ng-if="a.is_real">{{$index | abcd}}</span>
+						<span class="gray fr">统计全平台正确率为 {{pen(s.answer_right,s.answer_num)}}</span>
+					</h3>
+					<div ng-if="s.analysis.analysis" ng-bind-html="html('<span>参考解析：</span>'+s.analysis.analysis)">
+					</div>
+				</div>
+			</div>
+			<div class="btns">
+				<label class="b_btn" ng-click="card=false">关 闭</label>
+				<label class="b_btn red" ng-click="card=false||delStudy(s.qid)"><i class="i_trash"></i> 删除</label>
+				<label class="b_btn blue" ng-if="s.colled" ng-click="delStar(s)"><i class="i_fav_h"></i> 取消</label>
+				<label class="b_btn blue" ng-if="rt.type==1&&!s.colled" ng-click="addStar(s)"><i class="i_fav"></i> 收藏</label>
+			</div>
+		</div>
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>
