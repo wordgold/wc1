@@ -51,16 +51,24 @@ base.filter("slice", function() {
 	}
 })
 base.service("user", function($http) {
-	var s = this;
-	s.fire = function() {};
+	var s = this,
+		es = new Array();
+	s.bind = function(e) {
+		es.push(e);
+	};
+	s.fire = function() {
+		for (var i = es.length; i--; ) {
+			es[i]();
+		}
+	}
 	$http.post(service + "wxuser/checkUserinfo")
 		.then(function(r) {
-			if (r.data.code == 200) {
-				s.info = r.data.list[0];
-				s.fire();
-			} else{
-				location.href = '<!--#echo var="wc1"-->bind.html?href=' + encodeURIComponent(location.href);
-			}
+			// if (r.data.code == 200) {
+			// 	s.info = r.data.list[0];
+			// 	s.fire();
+			// } else
+			// 	location.href = '<!--#echo var="wc1"-->bind.html?href=' + encodeURIComponent(location.href);
+			s.fire();
 		});
 	s.selectC = function() {
 		s.sc = true;
@@ -229,23 +237,38 @@ base.controller('header', function($scope, user, hash) {
 	}
 })
 
-base.controller('banner', function($scope, user, hash) {
-
-	var $swi = $("#swipe i");
-	$("#swipe").Swipe({
-		startSlide: 0,
-		auto: 4000,
-		transitionEnd: function(index, element) {
-			$swi.removeClass("on").eq(index).addClass("on")
-		}
+base.controller('banner', function($scope, $http, user) {
+	user.bind(function(){
+		$scope.get();
 	})
+	$scope.get = function(){
+		$http.post(service + "wxuser/getWxImg?mid=" + user.info.mid)
+			.then(function(r) {
+				if (r.data.code == 200) {
+					$scope.list = r.data.list;
+					setTimeout(function(){
+						var $swi = $("#swipe i"),
+							$s = $("#swipe");
+						$s.find("a").slice($swi.length).remove();
+						$swi.eq(0).addClass("on");
+						$s.Swipe({
+							startSlide: 0,
+							auto: 4000,
+							transitionEnd: function(i) {
+								$swi.removeClass("on").eq(i).addClass("on");
+							}
+						})
+					},999)
+				}
+			});
+	};
 })
 
 base.controller('qlist', function($scope, $http, fac, user, hash, QType) {
 	$scope.nlist = QType;
-	user.fire = function() {
+	user.bind(function() {
 		$scope.get(1, true);
-	}
+	})
 	$scope.user = user;
 	$scope.rt = hash.init({
 		type: $scope.nlist[0].type
@@ -284,9 +307,9 @@ base.controller('clist', function($scope, $http, fac, user, hash, CType) {
 		href: '<!--#echo var="wc1"-->user/class.html',
 		type: 0
 	});
-	user.fire = function() {
+	user.bind(function() {
 		$scope.get(1, true);
-	}
+	})
 	$scope.rt = hash.init({
 		type: $scope.nlist[0].type
 	});
@@ -490,9 +513,9 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 })
 
 base.controller('wrong', function($scope, $http, $sce, fac, user, hash) {
-	user.fire = function() {
+	user.bind(function() {
 		$scope.get(1, true);
-	}
+	})
 	$scope.nlist = [{
 		type: "1",
 		name: "章节练习"
@@ -560,9 +583,9 @@ base.controller('wrong', function($scope, $http, $sce, fac, user, hash) {
 })
 
 base.controller('fav', function($scope, $http, $sce, fac, user, hash) {
-	user.fire = function() {
+	user.bind(function() {
 		$scope.get(1, true);
-	}
+	})
 	$scope.vote = fac.vote;
 	$scope.pen = fac.pen;
 	$scope.rows = 20;
@@ -624,12 +647,17 @@ base.controller('item', function($scope, $http, $timeout, fac, user, hash) {
 
 	$http.post(service + "gradeFront/getVideoBygid?gid=" + $scope.rt.gid)
 		.then(function(r) {
-			if (r.data.code == 200 && r.data.list[0]) {
-				$scope.grade_name = r.data.list[0].grade_name;
-				document.title = user.title = $scope.grade_name;
-				$scope.vlist = r.data.list;
+			if (r.data.code == 200) {
+				$scope.info = r.data.list;
+				document.title = user.title = $scope.info.name;
 				if (!$scope.rt.vid)
-					$scope.getVideo(r.data.list[0].id)
+					$scope.getVideo($scope.info.flist[0].id)
+				$http.post(service + "gradeFront/getVideoBygid?gid=" + $scope.info.parent_id)
+					.then(function(r) {
+						if (r.data.code == 200) {
+							$scope.pinfo = r.data.list;
+						}
+					});
 			}
 		});
 	$scope.getVideo = function(id, b) {
@@ -645,12 +673,6 @@ base.controller('item', function($scope, $http, $timeout, fac, user, hash) {
 		}
 	}
 
-	$http.post(service + "gradeFront/getGradeById?gid=" + $scope.rt.gid)
-		.then(function(r) {
-			if (r.data.code == 200) {
-				$scope.info = r.data.list[0];
-			}
-		});
 	$http.post(service + "gradeFront/findTBygid?gid=" + $scope.rt.gid)
 		.then(function(r) {
 			if (r.data.code == 200) {

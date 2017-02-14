@@ -6,19 +6,7 @@
 </head>
 <body ng-app="baseApp">
 <!--#include virtual="/include/header.html"-->
-<div id="swipe" class="swipe_b banner ng-init" ng-controller="banner">
-	<div class="swipe">
-		<a href="/baolihuayuan/picture-4-29992/" class="fl img" style="background-image:url(http://imgs.zhijia.com/b/2012/0807/1344329548288_600_450.jpg)">
-		</a>
-		<a href="/baolihuayuan/picture-11-161020/" class="fl img" style="background-image:url(http://imgs.zhijia.com/b/2015/0601/143313015089263_600_450.jpg)">
-		</a>
-		<a href="/baolihuayuan/picture-11-31229/" class="fl img" style="background-image:url(http://imgs.zhijia.com/b/2012/1012/1350026226552_600_450.jpg)">
-		</a>
-		<a href="/baolihuayuan/picture-5-159109/" class="fl img" style="background-image:url(http://imgs.zhijia.com/b/2015/0502/143054940090116_600_450.jpg)">
-		</a>
-	</div>
-	<p><i class="on"></i><i></i><i></i><i></i></p>
-</div>
+<!--#include virtual="/include/banner.html"-->
 <div ng-controller="clist" class="ng-init">
 	<!--#include virtual="/include/nav.html"-->
 	<div class="dlist panel" ng-if="rt.type==nlist[0].type&&list.length">

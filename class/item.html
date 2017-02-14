@@ -6,24 +6,24 @@
 </head>
 <body ng-app="baseApp">
 <!--#include virtual="/include/header.html"-->
-<div ng-controller="item" class="ng-init">
-	<div class="no_class" ng-if="!grade_name">
+<div ng-controller="item" class="ng-init" style="margin-bottom: 40px">
+	<div class="no_class" ng-if="!info.flist.length">
 		课程即将开始，请耐心等待……
 		<a href="<!--#echo var="wc1"-->class/list.html" class="b_btn red">查看其他班次</a>
 	</div>
-	<div ng-if="grade_name">
+	<div ng-if="info.flist.length">
 		<video ng-src="{{video}}" class="video" controls preload autoplay></video>
 		<!--#include virtual="/include/nav.html"-->
 		<div class="panel" ng-show="rt.type<3">
-			<h3 class="h3"><i class="i_video"></i>{{grade_name}} <b class="fr red">￥{{info.cmoney}}</b></h3>
+			<h3 class="h3"><i class="i_video"></i>{{info.name}} <b class="fr red">￥{{info.cmoney}}</b></h3>
 			<ul class="data" ng-show="rt.type==1">
 				<li><span class="fl">授课教师：</span>{{techers}}</li>
-				<li><span class="fl">课&ensp;&ensp;&ensp;&ensp;时：</span>{{info.vnums||'0'}}课时</li>
+				<li><span class="fl">课&ensp;&ensp;&ensp;&ensp;时：</span>{{info.flist.length}}课时</li>
 				<li><span class="fl">课程特色：</span>{{info.content}}</li>
 				<!-- <li><span class="fl">优惠政策：</span>优惠政策优惠政策优惠政策</li> -->
 			</ul>
 			<ul class="clist" ng-show="rt.type==2">
-				<li ng-repeat="v in vlist" ng-click="getVideo(v.id)"><u></u>{{v.name}}
+				<li ng-repeat="v in info.flist" ng-click="getVideo(v.id)"><u></u>{{v.name}}
 					<i class="i_pause red" ng-if="v.id==rt.vid"></i>
 					<i class="i_play" ng-if="!v.is_free&&v.id!=rt.vid"></i>
 					<i class="i_lock" ng-if="v.is_free&&v.id!=rt.vid"></i>
@@ -55,6 +55,28 @@
 					<label class="red b_btn"><button type="submit" ng-disabled="form.$invalid">发表评价</button></label>
 				</div>
 			</form>
+		</div>
+	</div>
+	<div class="fixed" ng-class="{'on':user.cs}">
+		<div class="btns">
+			<a href="<!--#echo var="wc1"-->user/car.html"><i class="i_car"></i>购物车</a>
+			<label class="bg_orange" ng-click="user.buy()">加入购物车</label>
+			<label class="bg_red" ng-click="user.buy(true)">立即购买</label>
+		</div>
+		<div class="pinfo">
+			<div class="il">
+				<img ng-src="{{pinfo.imgurl}}">
+				<big><b>{{pinfo.name}}</b></big>
+				<span class="red">￥{{pinfo.cmoney}}</span>
+			</div>
+			<div class="il">
+				<big>整套购买</big>
+				<label>{{pinfo.name}}</label>
+			</div>
+			<div class="il">
+				<big>单科购买</big>
+				<label ng-repeat="p in pinfo.glist">{{p.name}}</label>
+			</div>
 		</div>
 	</div>
 </div>

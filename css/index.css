@@ -87,6 +87,10 @@ sub {
 img {
 	border: 0
 }
+big{
+	font-size:16px;
+	color: #000;
+}
 table {
 	empty-cells: show;
 	border-collapse: collapse;
@@ -115,6 +119,9 @@ a {
 .red {
 	color: #f66
 }
+.bg_red{
+	background: #f66;
+}
 .blue {
 	color: #22a7f3
 }
@@ -129,6 +136,9 @@ a {
 }
 .orange {
 	color: #ed5d45
+}
+.bg_orange{
+	background: #f80;
 }
 .fl {
 	float: left
@@ -357,6 +367,38 @@ nav a.on{
 .alert .r_panel{
 	margin: 50px 4% 0 4%;
 }
+.fixed{
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	height: 40px;
+	width: 100%;
+	z-index: 32;
+}
+.fixed .btns{
+	margin: 0;
+	background: #fff;
+}
+.fixed .btns label{
+	flex: 1;
+	text-align: center;
+	line-height: 40px;
+	color: #fff;
+	font-size: 16px;
+}
+.fixed .btns a{
+	line-height: 20px;
+	border-top: 1px #ddd solid;
+	flex: 0 0 80px;
+	text-align: center;
+	font-size: 12px;
+	color: #666;
+}
+.fixed .btns i{
+	display: block;
+	margin: 5px auto 0 auto;
+	color: #f80;
+}
 /*header s*/
 header{
 	position: relative;
@@ -503,14 +545,18 @@ header .avatar{
 .banner i.on{
 	background: #22a7f3
 }
-.li{
+.li,.il{
 	display: block;
 	position: relative;
 	padding: 9px 4%;
 	border-bottom: 1px #ccc solid;
 	font-size: 14px;
 }
-.li:last-of-type{
+.il{
+	padding: 9px 0;
+	margin: 0 4%;
+}
+.li:last-of-type,.il:last-of-type{
 	border: 0;
 }
 .li span.gray{
@@ -730,7 +776,7 @@ header .avatar{
 	white-space: nowrap;
 }
 /*test o*/
-/*class o*/
+/*class s*/
 .video{
 	display: block;
 	width: 100%;
@@ -802,6 +848,39 @@ header .avatar{
 	text-align: center;
 	background: url(<!--#echo var="wc1"-->images/noclass.png) no-repeat 50% 20px;
 	background-size: 324px 158px;
+}
+.pinfo{
+	position: absolute;
+	left: 0;
+	bottom: 40px;
+	width: 100%;
+	padding: 0 0 20px 0;
+	margin: 0;
+	box-shadow: 0 -9px 20px rgba(0,0,0,.2);
+	background: #fff;
+}
+.pinfo img{
+	float: left;
+	height: 80px;
+	margin: -30px 9px 0 0;
+	border: 1px #fff solid;
+	border-radius: 4px;
+}
+.pinfo big{
+	display: block;
+}
+.pinfo label{
+	display: inline-block;
+	padding: 4px 8px;
+	margin: 9px 9px 0 0;
+	border: 1px #ccc solid;
+	font-size: 12px;
+	border-radius: 4px;
+}
+.pinfo label.on{
+	background: #22a7f3;
+	border-color: #22a7f3;
+	color: #fff;
 }
 /*class o*/
 /*form o*/
