@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'ic';
   src:
-    url('fonts/ic.ttf?hf0h1x') format('truetype'),
-    url('fonts/ic.woff?hf0h1x') format('woff'),
-    url('fonts/ic.svg?hf0h1x#ic') format('svg');
+    url('fonts/ic.ttf?wt4jsa') format('truetype'),
+    url('fonts/ic.woff?wt4jsa') format('woff'),
+    url('fonts/ic.svg?wt4jsa#ic') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -28,6 +28,12 @@ i {
 }
 .i_setting:before {
   content: "\e023";
+}
+.i_check:before {
+  content: "\e042";
+}
+.i_cross:before {
+  content: "\e043";
 }
 .i_trash:before {
   content: "\e109";

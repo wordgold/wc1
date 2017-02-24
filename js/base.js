@@ -1,6 +1,6 @@
 "use strict";
 var service = "http://wx.zkjan.com/kstk-api/";
-	// service = "http://192.168.3.15/kstk-api/";
+// service = "http://192.168.3.15/kstk-api/";
 var base = angular.module('baseApp', []);
 base.config(function($httpProvider) {
 	$httpProvider.defaults.headers.post["Content-Type"] = 'application/x-www-form-urlencoded;charset=UTF-8';
@@ -52,23 +52,42 @@ base.filter("slice", function() {
 })
 base.service("user", function($http) {
 	var s = this,
-		es = new Array();
+		es = new Array(),
+		getNews = function() {
+			$http.post(service + "webuser/getNews")
+				.then(function(r) {
+					if (r.data.code == 200) {
+						s.news = r.data.list;
+						s.unread = 0;
+						for (var i = s.news.length; i--;) {
+							if (!s.news[i].is_read)
+								s.unread++;
+						}
+						setTimeout(getNews, 99999)
+					}
+				});
+		}
+	getNews();
 	s.bind = function(e) {
 		es.push(e);
 	};
 	s.fire = function() {
-		for (var i = es.length; i--; ) {
+		for (var i = es.length; i--;) {
 			es[i]();
 		}
 	}
 	$http.post(service + "wxuser/checkUserinfo")
 		.then(function(r) {
-			// if (r.data.code == 200) {
-			// 	s.info = r.data.list[0];
-			// 	s.fire();
-			// } else
-			// 	location.href = '<!--#echo var="wc1"-->bind.html?href=' + encodeURIComponent(location.href);
-			s.fire();
+			if (r.data.code == 200) {
+				s.info = r.data.list[0];
+				if (!s.info.mid)
+					s.selectM()
+				else if (!s.info.cid)
+					s.selectC()
+				else
+					s.fire();
+			} else
+				location.href = '<!--#echo var="wc1"-->bind.html?href=' + encodeURIComponent(location.href);
 		});
 	s.selectC = function() {
 		s.sc = true;
@@ -100,6 +119,31 @@ base.service("user", function($http) {
 		s.info.major = name;
 		s.info.mid = id;
 		s.selectC();
+	}
+	s.buy = function(id) {
+		if (!s.info.added)
+			$http.get(service + "gradeFront/addShopcar?gids=" + id)
+			.then(function(r) {
+				if (r.data.code == 200) {
+					s.info.carcount = r.data.count;
+					s.info.added = true;
+				}
+				alert(r.data.msg);
+			})
+	}
+	s.pay = function(data) {
+		WeixinJSBridge.invoke('getBrandWCPayRequest', {
+				"appId": data.appId,
+				"timeStamp": data.timeStamp + "",
+				"nonceStr": data.nonceStr + "",
+				"package": data.package,
+				"signType": "MD5",
+				"paySign": data.sign
+			},
+			function(res) {
+				location.href = '<!--#echo var="wc1"-->user/order.html?type=' + (res.err_msg == "get_brand_wcpay_request:ok" ? '1' : '0') + '&r=' + Math.random()
+			}
+		);
 	}
 }).service("hash", function() {
 	var t = this,
@@ -233,20 +277,23 @@ base.directive('vphone', function() {
 base.controller('header', function($scope, user, hash) {
 	$scope.user = user;
 	$scope.back = function() {
-		window.history.back()
+		if (typeof document.referrer === '')
+			location.href = '<!--#echo var="wc1"-->class/list.html';
+		else
+			history.back();
 	}
 })
 
 base.controller('banner', function($scope, $http, user) {
-	user.bind(function(){
+	user.bind(function() {
 		$scope.get();
 	})
-	$scope.get = function(){
+	$scope.get = function() {
 		$http.post(service + "wxuser/getWxImg?mid=" + user.info.mid)
 			.then(function(r) {
 				if (r.data.code == 200) {
 					$scope.list = r.data.list;
-					setTimeout(function(){
+					setTimeout(function() {
 						var $swi = $("#swipe i"),
 							$s = $("#swipe");
 						$s.find("a").slice($swi.length).remove();
@@ -258,7 +305,7 @@ base.controller('banner', function($scope, $http, user) {
 								$swi.removeClass("on").eq(i).addClass("on");
 							}
 						})
-					},999)
+					}, 999)
 				}
 			});
 	};
@@ -324,7 +371,10 @@ base.controller('clist', function($scope, $http, fac, user, hash, CType) {
 		}
 	};
 	$scope.get = function(i, b) {
-		if (b || i != $scope.page.index) {
+		if ($scope.rt.type == 2) {
+			$scope.list = [];
+			$scope.loading = false;
+		} else if (b || i != $scope.page.index) {
 			$scope.list = [];
 			$scope.loading = true;
 			$scope.page.index = i;
@@ -358,12 +408,157 @@ base.controller('myclass', function($scope, $http, fac, user, hash, CType) {
 		}
 	};
 	$scope.get = function(i, b) {
-		if (b || i != $scope.page.index) {
+		if ($scope.rt.type == 2) {
+			$scope.loading = false;
 			$scope.list = [];
+		} else if (b || i != $scope.page.index) {
 			$scope.loading = true;
 			$scope.page.index = i;
+			$http.post(service + "webuser/getMyGrade?page=" + $scope.page.index + "&rows=" + $scope.rows)
+				.then(function(r) {
+					$scope.loading = false;
+					if (r.data.code == 200) {
+						$scope.list = r.data.list;
+						$scope.page = fac.page($scope.page.index, $scope.rows, r.data.total)
+					}
+				});
 		}
 	}
+	$scope.get(1);
+})
+
+base.controller('order', function($scope, $http, fac, user, hash) {
+	$scope.nlist = [{
+		name: "已完成订单",
+		type: 1
+	}, {
+		name: "未完成订单",
+		type: 0
+	}];
+	user.title = "我的订单";
+	$scope.rows = 20;
+	$scope.rt = hash.init({
+		type: $scope.nlist[0].type
+	});
+
+	$scope.list = new Array(new Array(), new Array(), new Array());
+	$http.post(service + "webuser/getMyOrder?rows=9999")
+		.then(function(r) {
+			if (r.data.code == 200) {
+				angular.forEach(r.data.list, function(v, i) {
+					$scope.list[v.status].push(v);
+				})
+				$scope.get(1)
+			}
+		});
+
+	$scope.setType = function(type) {
+		if ($scope.rt.type != type) {
+			$scope.rt.type = type;
+			$scope.get(1);
+		}
+	};
+	$scope.get = function(i) {
+		$scope.page = fac.page(i, $scope.rows, $scope.list[$scope.rt.type].length)
+		$scope.list[2] = $scope.list[$scope.rt.type].slice(($scope.page.index - 1) * $scope.rows, $scope.page.index * $scope.rows);
+	}
+	$scope.del = function(id, i) {
+		$http.post(service + "webuser/removeMyOrder?ids=" + id);
+		$scope.list[$scope.rt.type].splice(($scope.page.index - 1) * $scope.rows + i, 1)
+		$scope.get(1);
+	}
+	$scope.pay = function(id) {
+		$http.post(service + "wxuser/wxReplaypay?id=" + id)
+			.then(function(r) {
+				if (r.data.code == 200) {
+					user.pay(r.data);
+				} else {
+					$scope.paying = "";
+					alert(r.data.msg);
+				}
+			});
+	}
+})
+
+base.controller('car', function($scope, $http, fac, user) {
+	user.title = "购物车";
+	$scope.loading = true;
+
+	$http.post(service + "gradeFront/getShopcar")
+		.then(function(r) {
+			$scope.loading = false;
+			if (r.data.code == 200)
+				$scope.list = r.data.list;
+		});
+
+	$scope.checklength = $scope.price = 0;
+	$scope.del = function(g, i) {
+		$http.post(service + "gradeFront/removeShopcar?ids=" + g.sid);
+		$scope.list.splice(i, 1);
+		user.carcount = $scope.list.length;
+	}
+	$scope.check = function(g) {
+		if (g.check = !g.check) {
+			$scope.checklength++;
+			$scope.price += g.cmoney - 0;
+		} else {
+			$scope.checklength--
+				$scope.price -= g.cmoney - 0;
+		}
+	}
+	$scope.checkAll = function() {
+		var i = $scope.list.length;
+		$scope.price = 0;
+		if ($scope.checklength == i) {
+			for (; i--;) {
+				$scope.list[i].check = false;
+			}
+			$scope.checklength = 0;
+		} else {
+			for (; i--;) {
+				$scope.list[i].check = true;
+				$scope.price += $scope.list[i].cmoney - 0;
+			}
+			$scope.checklength = $scope.list.length;
+		}
+	}
+	$scope.pay = function(id) {
+		if ($scope.checklength && !$scope.paying) {
+			$scope.paying = "中";
+			var l = $scope.list.length,
+				s = new Array();
+			for (; l--;) {
+				if ($scope.list[l].check) {
+					s.push($scope.list[l].sid);
+				}
+			}
+			$http.post(service + "wxuser/wxPay?ids=" + s.join())
+				.then(function(r) {
+					if (r.data.code == 200) {
+						user.pay(r.data);
+					} else {
+						$scope.paying = "";
+						alert(r.data.msg);
+					}
+				});
+		}
+	}
+})
+
+base.controller('pay', function($scope, $http, fac, user, hash) {
+	user.title = "支付订单";
+	$scope.loading = true;
+
+	$scope.rt = hash;
+
+	$http.post(service + "gradeFront/findOrderbyid?id=" + $scope.rt.id)
+		.then(function(r) {
+			if (r.data.code == 200) {
+				$scope.money = r.data.list[0].money;
+				$scope.no = r.data.list[0].out_trade_no;
+				$scope.status = r.data.list[0].status;
+			}
+		});
 })
 
 base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, user, hash, QType) {
@@ -491,7 +686,7 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 		$scope.viewCard();
 	}
 	$scope.viewCard = function() {
-		$scope.submited ? ($scope.time_stoped = !$scope.time_stoped) : $scope.changeTime();
+		($scope.submited || $scope.showBtn) ? ($scope.time_stoped = !$scope.time_stoped) : $scope.changeTime();
 		$scope.card_show = !$scope.card_show;
 	}
 	$scope.submit = function() {
@@ -626,7 +821,7 @@ base.controller('fav', function($scope, $http, $sce, fac, user, hash) {
 
 base.controller('item', function($scope, $http, $timeout, fac, user, hash) {
 	$scope.user = user;
-	$scope.random = Math.floor(Math.random()*9)%3+1
+	$scope.random = Math.floor(Math.random() * 9) % 3 + 1
 	$scope.rt = hash.init({
 		type: 1
 	});
@@ -656,6 +851,18 @@ base.controller('item', function($scope, $http, $timeout, fac, user, hash) {
 					.then(function(r) {
 						if (r.data.code == 200) {
 							$scope.pinfo = r.data.list;
+							var money = 0,
+								i = $scope.pinfo.glist.length;
+							for (; i--;) {
+								var p = $scope.pinfo.glist[i];
+								money += p.cmoney - 0;
+								if ($scope.rt.gid == p.id) {
+									p.check = true;
+									$scope.buyid.push(p.id);
+									$scope.price = p.cmoney;
+								}
+							}
+							$scope.pinfo.ymoney = money - $scope.pinfo.cmoney;
 						}
 					});
 			}
@@ -667,7 +874,7 @@ base.controller('item', function($scope, $http, $timeout, fac, user, hash) {
 					if (r.data.code == 200) {
 						$scope.rt.vid = id;
 						$scope.video = r.data.url;
-					}else
+					} else
 						alert(r.data.msg)
 				});
 		}
@@ -687,6 +894,7 @@ base.controller('item', function($scope, $http, $timeout, fac, user, hash) {
 
 	$scope.star = 0;
 	$scope.stars = [1, 2, 3, 4, 5];
+	$scope.comment = "";
 	$scope.sub = function() {
 		$scope.errMsg = "正在请求，请稍候…";
 		$http.post(service + "gradeFront/addComment", "gid=" + $scope.rt.gid + "&content=" + $scope.comment + "&star=" + $scope.star)
@@ -694,7 +902,7 @@ base.controller('item', function($scope, $http, $timeout, fac, user, hash) {
 				$scope.errMsg = r.data.msg;
 				$timeout(function() {
 					$scope.errMsg = "";
-					if (r.data.code == 200){
+					if (r.data.code == 200) {
 						$scope.getComment();
 						$scope.post = false;
 					}
@@ -708,6 +916,47 @@ base.controller('item', function($scope, $http, $timeout, fac, user, hash) {
 			});
 	}
 	$scope.getComment();
+
+	$scope.showBuy = false;
+	$scope.buyid = new Array();
+	$scope.check = function(p, b) {
+		$scope.buyid.length = $scope.price = 0;
+		p.check = !p.check;
+		if (b) {
+			if (p.check) {
+				$scope.buyid.push(p.id);
+				$scope.price = p.cmoney;
+			}
+			for (var i = $scope.pinfo.glist.length; i--;) {
+				$scope.pinfo.glist[i].check = p.check;
+			}
+		} else {
+			for (var i = $scope.pinfo.glist.length; i--;) {
+				if ($scope.pinfo.glist[i].check) {
+					$scope.buyid.push($scope.pinfo.glist[i].id)
+					$scope.price += $scope.pinfo.glist[i].cmoney - 0;
+				}
+			}
+			if ($scope.buyid.length == $scope.pinfo.glist.length) {
+				$scope.pinfo.check = true;
+				$scope.buyid.length = 0;
+				$scope.buyid.push($scope.pinfo.id);
+				$scope.price = $scope.pinfo.cmoney;
+			} else
+				$scope.pinfo.check = false;
+		}
+	}
+	$scope.pay = function(s) {
+		$http.post(service + "wxuser/addBalance?gids=" + s.join())
+			.then(function(r) {
+				if (r.data.code == 200) {
+					user.pay(r.data);
+				} else {
+					$scope.paying = "";
+					alert(r.data.msg);
+				}
+			});
+	}
 })
 
 base.controller('info', function($scope, $http, $timeout, user, fac) {
@@ -751,40 +1000,6 @@ base.controller('info', function($scope, $http, $timeout, user, fac) {
 })
 
 base.controller('bind', function($scope, $http, $interval, hash, fac) {
-	$scope.mid = "";
-	$scope.mlist = [{
-		id: "",
-		major_name: "请选择报考专业"
-	}];
-	$scope.cid = "";
-	$scope.clist = [{
-		id: "",
-		course_name: "请选择报考科目"
-	}];
-
-	$http.post(service + "frontIndex/getAllFrontMajor")
-		.then(function(r) {
-			if (r.data.code == 200) {
-				r.data.list.unshift($scope.mlist[0])
-				$scope.mlist = r.data.list;
-			}
-		});
-
-	$scope.setMid = function(id) {
-		$scope.cid = "";
-		if (id)
-			$http.post(service + "frontIndex/getAllFrontCourseByMid?major_id=" + id)
-			.then(function(r) {
-				if (r.data.code == 200) {
-					r.data.list.unshift({
-						id: "",
-						course_name: "请选择报考科目"
-					})
-					$scope.clist = r.data.list;
-				}
-			});
-	};
-
 	$scope.send = function(ph) {
 		if ($scope.user.phone.$valid && !$scope.sended) {
 			$http.get(service + "wxuser/getCode?ph=" + ph)
@@ -816,4 +1031,23 @@ base.controller('bind', function($scope, $http, $interval, hash, fac) {
 					location.href = hash.href;
 			});
 	}
+})
+
+base.controller('news', function($scope, $http, $sce, user, hash, fac) {
+	user.title = "消息";
+	$scope.user = user;
+	$scope.rt = hash;
+	$scope.html = function(s) {
+		return $sce.trustAsHtml(s);
+	}
+	if ($scope.rt.id)
+		$http.get(service + "webuser/getNewsByid?nid=" + $scope.rt.id)
+		.then(function(r) {
+			if (r.data.code == 200) {
+				$scope.info = r.data.list[0];
+			} else {
+				alert(r.data.msg)
+				location.href = '<!--#echo var="wc1"-->user/news.html'
+			}
+		})
 })

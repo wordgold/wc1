@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>我的订单</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="order" class="ng-init">
+	<!--#include virtual="/include/nav.html"-->
+	<ul class="orderlist" ng-if="list[2].length">
+		<li class="panel" ng-repeat="s in list[2]">
+			<h4 class="h4">订单编号：{{s.out_trade_no}} <big class="red fr">￥{{s.total_fee}}</big></h4>
+			<p class="li" ng-repeat="g in s.glist">
+				<a ng-href="<!--#echo var="wc1"-->class/item.html?mid={{g.major_id}}&cid={{g.course_id}}&gid={{g.id}}">
+					<img ng-src="{{g.imgurl}}">{{g.name}} <br> <span class="gray">￥{{g.cmoney|money}}</span>
+				</a>
+			</p>
+			<p class="li">
+				<span class="gray">{{s.time_start|justDay}}</span>
+				<label ng-if="rt.type==0" class="btn fr red" ng-click="pay(s.id)">前往支付</label>
+				<label class="btn fr gray" ng-click="del(s.id,$index)">删除订单</label>
+			</p>
+		</li>
+	</ul>
+	<!--#include virtual="/include/pagination.html"-->
+	<div class="none gray" ng-show="!list[2].length">
+		您目前还没有任何此类订单<br>
+		现在您可以点击下方按钮
+		<a href="<!--#echo var="wc1"-->class/list.html" class="b_btn bg_red">选购课程</a>
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

@@ -54,7 +54,7 @@
 		<div ng-show="time_stoped" class="alert">
 			<div class="r_panel" ng-show="!card_show&&!time_end">
 				<h4>答题暂停中</h4>
-				<label class="b_btn blue" ng-click="timePlay()"><i class="icon i_play"></i> 继续答题</label>
+				<label class="b_btn bg_blue" ng-click="timePlay()"><i class="icon i_play"></i> 继续答题</label>
 			</div>
 			<div class="r_panel" ng-show="card_show&&!submit_show">
 				<div class="card max_h">
@@ -64,15 +64,15 @@
 					</div>
 				</div>
 				<span class="i_score" ng-if="submited">{{score}}</span>
-				<div class="btns"><label class="b_btn" ng-click="viewCard()">关闭答题卡</label><label ng-if="!submited" class="b_btn red" ng-click="$parent.submit_show=true"><i class="icon i_done_all"></i> 提交试卷</label></div>
+				<div class="btns"><label class="b_btn" ng-click="viewCard()">关闭答题卡</label><label ng-if="!submited" class="b_btn bg_red" ng-click="$parent.submit_show=true"><i class="icon i_done_all"></i> 提交试卷</label></div>
 			</div>
 			<div class="r_panel" ng-show="submit_show">
 				<h4>确认提交试卷？</h4>
-				<div class="btns" ng-click="submit_show=false"><label class="b_btn"><i class="icon i_left"></i> 返回答题卡</label><label class="b_btn red" ng-click="submit()"><i class="icon i_done_all"></i> 确认提交</label></div>
+				<div class="btns" ng-click="submit_show=false"><label class="b_btn"><i class="icon i_left"></i> 返回答题卡</label><label class="b_btn bg_red" ng-click="submit()"><i class="icon i_done_all"></i> 确认提交</label></div>
 			</div>
 			<div class="r_panel" ng-show="time_end">
 				<h4>考试时间已到<br>请点击下方按钮</h4>
-				<label class="b_btn red" ng-click="time_end=false||submit()"><i class="icon i_done_all"></i> 提交试卷</label>
+				<label class="b_btn bg_red" ng-click="time_end=false||submit()"><i class="icon i_done_all"></i> 提交试卷</label>
 			</div>
 		</div>
 	</div>

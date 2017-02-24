@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>选班报名</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="news" class="ng-init">
+	<div class="panel" ng-if="!rt.id">
+		<a ng-href="<!--#echo var="wc1"-->user/news.html?id={{n.id}}" class="li" ng-repeat="n in user.news" ng-class="{'read':n.is_read}">
+			{{n.title | slice : 16}} <sup class="tag bg_red" ng-if="!n.is_read">未读</sup> <span class="gray fr">{{n.create_time}}</span>
+		</a>
+	</div>
+	<div class="panel news" ng-if="rt.id">
+		<h3 class="h3"><i class="i_news"></i>{{info.title}}</h3>
+		<div class="content" ng-bind-html="html(info.content)"></div>
+		<span class="gray fr newstime">{{info.create_time}}</span>
+	</div>
+	<div class="none gray" ng-show="!rt.id&&!user.news.length">
+		暂无消息
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

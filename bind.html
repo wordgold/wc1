@@ -19,15 +19,8 @@
 				<label for="code" class="f_i"><big class="red">*</big>验证码</label>
 				<input id="code" maxlength="4" minlength="4" type="text" class="txt" ng-model="code" name="code" required placeholder="请输入短信里的验证码">
 				<label class="btn disabled" ng-click="send(user.phone.$modelValue)" ng-class="{'disabled':user.phone.$invalid||sended}" ng-bind="sended?'等待 '+s+' 秒…':'获取短信'"></label></li>
-			<li class="li">
-				<label for="mid" class="f_i"><big class="red">*</big>考试专业</label>
-				<select id="mid" class="txt" name="mid" ng-model="mid" ng-change="setMid(mid)" required ng-options="m.id as m.major_name for m in mlist"></select></li>
-			<li class="li">
-				<label for="cid" class="f_i"><big class="red">*</big>考试科目</label>
-				<select id="cid" class="txt" name="cid" ng-model="cid" required ng-options="c.id as c.course_name for c in clist">
-				</select></li>
 		</ul>
-		<label class="red b_btn"><button type="submit" ng-disabled="user.$invalid">提交</button></label>
+		<label class="bg_red b_btn"><button type="submit" ng-disabled="user.$invalid">提交</button></label>
 	</form>
 	<div ng-show="errMsg" class="r_panel red" style="text-align: center;font-size: 14px;" ng-bind="errMsg">
 	</div>

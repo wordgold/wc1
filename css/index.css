@@ -7,7 +7,7 @@ body {
 	margin: 0;
 	padding: 0;
 	color: #444;
-	font: 400 12px/1.8 Verdana, "Microsoft YaHei", sans-serif
+	font: 400 12px/1.8 Verdana, sans-serif
 }
 .f_bold {
 	font-weight: bold
@@ -24,6 +24,7 @@ input[type=checkbox]{
 	cursor: pointer;
 }
 .txt, select, textarea {
+	font-size: inherit;
 	background-color: #fff;
 	border-radius: 4px;
 	border: 1px #aaa solid;
@@ -48,10 +49,11 @@ input[type=checkbox]{
 	color: #999
 }
 .txt[disabled] {
+	opacity: 1;
 	background: #eee;
 	border: 1px solid #ccc;
 	box-shadow: none;
-	color: #aaa;
+	color: #666;
 	cursor: not-allowed;
 }
 textarea {
@@ -116,30 +118,6 @@ a {
 	color: #22a7f3;
 	text-decoration: none
 }
-.red {
-	color: #f66
-}
-.bg_red{
-	background: #f66;
-}
-.blue {
-	color: #22a7f3
-}
-.gray {
-	color: #999
-}
-.grayish{
-	color: #ccc;
-}
-.green {
-	color: #0fbb2c
-}
-.orange {
-	color: #ed5d45
-}
-.bg_orange{
-	background: #f80;
-}
 .fl {
 	float: left
 }
@@ -166,11 +144,18 @@ i{
 	opacity: 0;
 	/*transform: translate3d(0,-9px,0);
 	transform: scale3d(.9,.9,.9);*/
-	transition:all ease-out .4s .2s;
 }
 .ng-scope .ng-init{
 	opacity: 1;
 	transform: none;
+	transition:all ease-out .4s;
+}
+.tag{
+	display: inline-block;
+	line-height: 16px;
+	padding: 0 2px;
+	font-size: 12px;
+	border-radius: 4px;
 }
 .b_btn,.btn{
 	position: relative;
@@ -206,20 +191,10 @@ button:disabled{
 	color: #666;
 	border-color: #ccc;
 }
-.b_btn.blue,.b_btn:hover,.b_btn:focus{
-	background: #22a7f3;
-	color: #fff;
-	border-color: #22a7f3;
-}
-.b_btn.red{
-	background: #f66;
-	color: #fff;
-	border-color: #f66;
-}
 .btn{
 	display: inline-block;
-	height: 20px;
-	line-height: 20px;
+	height: 1.6em;
+	line-height: 1.6em;
 	font-size: 14px;
 	color: #22a7f3;
 }
@@ -294,10 +269,10 @@ h2.panel{
 .r_panel .h3{
 	margin: 0 0 9px 0;
 }
-.h3{
+.h3,.h4{
 	height: 40px;
 	line-height: 40px;
-    border-bottom: 1px #ddd solid;
+    border-bottom: 1px #ccc solid;
 	font-size: 16px;
 }
 .h3 i:last-of-type{
@@ -305,6 +280,10 @@ h2.panel{
 }
 .h3 .fr{
 	font-size: 12px;
+}
+.h4{
+	font-size: 14px;
+	padding: 0 4%;
 }
 .none{
 	padding: 120px 0 0 0;
@@ -371,33 +350,68 @@ nav a.on{
 	position: fixed;
 	left: 0;
 	bottom: 0;
-	height: 40px;
 	width: 100%;
 	z-index: 32;
+	background: #fff;
 }
 .fixed .btns{
 	margin: 0;
-	background: #fff;
 }
-.fixed .btns label{
+.fixed .btns label,.fixed .btns span{
 	flex: 1;
 	text-align: center;
 	line-height: 40px;
-	color: #fff;
-	font-size: 16px;
+	font-size: 14px;
+	border-top: 1px #ddd solid;
+}
+.fixed .btns .disabled{
+	opacity: .6;
 }
 .fixed .btns a{
 	line-height: 20px;
 	border-top: 1px #ddd solid;
-	flex: 0 0 80px;
+	flex: 0 0 99px;
 	text-align: center;
 	font-size: 12px;
 	color: #666;
 }
-.fixed .btns i{
+.fixed .btns a i{
 	display: block;
 	margin: 5px auto 0 auto;
 	color: #f80;
+}
+.red {
+	color: #f66
+}
+.bg_red{
+	background: #f66;
+	border-color: #f66 !important;
+	color: #fff;
+}
+.gray {
+	color: #aaa
+}
+.grayish{
+	color: #ccc;
+}
+.green {
+	color: #0fbb2c
+}
+.orange {
+	color: #ed5d45
+}
+.bg_orange{
+	background: #f80;
+	border-color: #f80 !important;
+	color: #fff;
+}
+.blue {
+	color: #22a7f3
+}
+.bg_blue {
+	background: #22a7f3;
+	border-color: #22a7f3 !important;
+	color: #fff;
 }
 /*header s*/
 header{
@@ -549,7 +563,7 @@ header .avatar{
 	display: block;
 	position: relative;
 	padding: 9px 4%;
-	border-bottom: 1px #ccc solid;
+	border-bottom: 1px #ddd solid;
 	font-size: 14px;
 }
 .il{
@@ -778,9 +792,15 @@ header .avatar{
 /*test o*/
 /*class s*/
 .video{
+	height: 200px;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-size: cover;
+}
+.video video{
 	display: block;
 	width: 100%;
-	height: 200px;
+	height: 100%;
 	background: #000;
 }
 .data{
@@ -789,12 +809,12 @@ header .avatar{
 .data li{
 	line-height: 24px;
 	min-height:24px;
-	padding: 4px 0 4px 70px;
+	padding: 4px 0 4px 80px;
 	font-size: 14px;
 }
 .data span.fl{
-	width: 70px;
-	margin:0 0 0 -70px;
+	width: 80px;
+	margin:0 0 0 -80px;
 	color: #999;
 }
 .clist{
@@ -850,14 +870,7 @@ header .avatar{
 	background-size: 324px 158px;
 }
 .pinfo{
-	position: absolute;
-	left: 0;
-	bottom: 40px;
-	width: 100%;
-	padding: 0 0 20px 0;
-	margin: 0;
 	box-shadow: 0 -9px 20px rgba(0,0,0,.2);
-	background: #fff;
 }
 .pinfo img{
 	float: left;
@@ -869,7 +882,10 @@ header .avatar{
 .pinfo big{
 	display: block;
 }
-.pinfo label{
+.pinfo span{
+	font-size: 12px;
+}
+.pinfo .il label{
 	display: inline-block;
 	padding: 4px 8px;
 	margin: 9px 9px 0 0;
@@ -881,6 +897,66 @@ header .avatar{
 	background: #22a7f3;
 	border-color: #22a7f3;
 	color: #fff;
+}
+.pinfo .i_cross{
+	font-size: 24px;
+	position: absolute;
+	right:4%;
+	top: 9px;
+}
+.carlist{
+	margin: 1em 0 40px 0;
+}
+.carlist .li{
+	overflow: hidden;
+}
+.carlist img,.orderlist img{
+	float: left;
+	width:68px;
+	height: 48px;
+	margin: 0 9px 0 40px;
+	border-radius: 4px;
+}
+.carlist i{
+	position: absolute;
+	left: 0;
+	top:0;
+	width:40px;
+	height:66px;
+	line-height: 66px;
+	text-align: center;
+}
+.carlist .i_trash{
+	left: auto;
+	right: 0;
+}
+.carlist label{
+	float: left;
+	width: 40px;
+	height: 69px;
+	line-height: 69px;
+	text-align: center;
+}
+.carlist div{
+	position: absolute;
+	right: -80px;
+	top: 0;
+	transition: right ease-out .2s;
+}
+.carlist .del div{
+	right: 0;
+}
+.carlist .check{
+	background: #eee;
+}
+.carlist .check .i_check{
+	color: #f66;
+}
+.orderlist img{
+	margin: 0 9px 0 0;
+}
+.orderlist .btn{
+	margin: 0 0 0 9px;
 }
 /*class o*/
 /*form o*/
@@ -945,3 +1021,17 @@ header .avatar{
 	margin: 9px 4%;
 }
 /*form o*/
+/*news s*/
+.read{
+	background: #f6f6f6;
+	color: #999;
+}
+.news .content,.newstime{
+	padding: 20px 4%;
+}
+.news .h3{
+	height: auto;
+	padding: 9px 4%;
+	line-height: 32px;
+}
+/*news o*/

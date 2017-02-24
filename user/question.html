@@ -40,9 +40,9 @@
 			</div>
 			<div class="btns">
 				<label class="b_btn" ng-click="card=false">关 闭</label>
-				<label class="b_btn red" ng-click="card=false||delStudy(s.qid)"><i class="i_trash"></i> 删除</label>
-				<label class="b_btn blue" ng-if="s.colled" ng-click="delStar(s)"><i class="i_fav_h"></i> 取消</label>
-				<label class="b_btn blue" ng-if="rt.type==1&&!s.colled" ng-click="addStar(s)"><i class="i_fav"></i> 收藏</label>
+				<label class="b_btn bg_red" ng-click="card=false||delStudy(s.qid)"><i class="i_trash"></i> 删除</label>
+				<label class="b_btn bg_blue" ng-if="s.colled" ng-click="delStar(s)"><i class="i_fav_h"></i> 取消</label>
+				<label class="b_btn bg_blue" ng-if="rt.type==1&&!s.colled" ng-click="addStar(s)"><i class="i_fav"></i> 收藏</label>
 			</div>
 		</div>
 	</div>
