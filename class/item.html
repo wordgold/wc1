@@ -13,7 +13,7 @@
 	</div>
 	<div ng-if="info.flist.length">
 		<div class="video" style="background-image:url({{info.imgurl}})">
-			<video ng-show="!post" ng-src="{{video}}" controls preload autoplay></video>
+			<video ng-show="!post" id="vo" ng-src="{{video}}" controls preload autoplay playsinline></video>
 		</div>
 		<!--#include virtual="/include/nav.html"-->
 		<div class="panel" ng-show="rt.type<3">
@@ -25,7 +25,7 @@
 				<!-- <li><span class="fl">优惠政策：</span>优惠政策优惠政策优惠政策</li> -->
 			</ul>
 			<ul class="clist" ng-show="rt.type==2">
-				<li ng-repeat="v in info.flist" ng-click="getVideo(v.id)"><u></u>{{v.name}}
+				<li ng-repeat="v in info.flist" ng-click="getVideo(v)"><u></u>{{v.name}}
 					<i class="i_pause red" ng-if="v.id==rt.vid"></i>
 					<i class="i_play" ng-if="!v.is_free&&v.id!=rt.vid"></i>
 					<i class="i_lock" ng-if="v.is_free&&v.id!=rt.vid"></i>
@@ -74,11 +74,11 @@
 			</div>
 			<div class="il">
 				<big>整套购买</big>
-				<label ng-class="{'on':pinfo.check}" ng-click="check(pinfo,true)">{{pinfo.name}} - ￥{{pinfo.cmoney}}</label> <span class="gray">（优惠￥{{pinfo.ymoney}}）</span>
+				<label ng-class="{'on':pinfo.check}" ng-click="check(pinfo,true)">{{pinfo.name}} ￥{{pinfo.cmoney}}</label> <span class="gray">（优惠￥{{pinfo.ymoney}}）</span>
 			</div>
 			<div class="il">
 				<big>单科购买</big>
-				<label ng-repeat="p in pinfo.glist" ng-class="{'on':p.check}" ng-click="check(p)">{{p.name}} - ￥{{p.cmoney}}</label>
+				<label ng-repeat="p in pinfo.glist" ng-class="{'on':p.check}" ng-click="check(p)">{{p.name}} ￥{{p.cmoney}}</label>
 			</div>
 			<label class="b_btn bg_red"><button ng-disabled="!buyid.length" ng-click="pay(buyid)">确认支付</button></label>
 		</dov>

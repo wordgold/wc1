@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>学习计划</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="history" class="ng-init">
+	<!--#include virtual="/include/nav.html"-->
+	<div ng-if="rt.type==1&&list.length">
+		<ul class="ol_qlist qlist panel" ng-repeat="s in list">
+			<h3 class="h3"><i class="i_video"></i>{{s.name}}</h3>
+			<li class="li" ng-repeat="g in s.jdlist" ng-class="{'on':g.showL}">
+				<div ng-click="g.showL=!g.showL">
+					<i ng-if="g.flist.length&&!g.showL" class="i_control_point gray"></i>
+					<i ng-if="g.flist.length&&g.showL" class="i_remove_point blue"></i>
+					<b>第 {{$index | xyz}} 阶段：</b>观看视频
+				</div>
+				<ol ng-if="g.flist.length">
+					<hr>
+					<li class="li" ng-repeat="f in g.flist">
+						<i class="i_circle"></i>
+						<a ng-href="<!--#echo var="wc1"-->class/item.html?mid={{f.major_id}}&cid={{f.course_id}}&gid={{f.gid}}&vid={{f.id}}"><i class="i_play"></i> {{f.name}}</a><br>
+						<span class="gray">观看进度：</span><i class="i_bar"><u class="a" ng-style="{width:f.current_time/f.total_time*100+'%'}"></u></i>
+						<span style="margin-left: 9px"><a ng-if="f.ppt_url" ng-href="{{f.ppt_url}}" target="_blank"><i class="i_download"></i> 查看课件</a></span>
+					</li>
+				</ol>
+			</li>
+		</ul>
+	</div>
+	<div ng-if="rt.type==2&&list.length">
+		<ul class="ol_qlist qlist panel" ng-repeat="s in list">
+			<h3 class="h3"><i class="i_qlist"></i>{{s.name}}</h3>
+			<li class="li" ng-repeat="g in s.jdlist" ng-class="{'on':g.showL}">
+				<div ng-click="g.showL=!g.showL">
+					<i ng-if="g.examlist.length&&!g.showL" class="i_control_point gray"></i>
+					<i ng-if="g.examlist.length&&g.showL" class="i_remove_point blue"></i>
+					<b>第 {{$index | xyz}} 阶段：</b>练习试题
+				</div>
+				<ol ng-if="g.examlist.length">
+					<hr>
+					<a class="li" ng-repeat="e in g.examlist" ng-init="e.p=e.zdnums/e.yznums" ng-href="<!--#echo var="wc1"-->question/test.html?mid={{s.major_id}}&cid={{s.course_id}}&type=grade&sid={{e.id}}&name={{e.title}}">
+						<i class="i_circle"></i>
+						{{e.title}}<br>
+						<span class="gray">答题进度：</span><i class="i_bar" ng-if="e.yznums"><u ng-class="{'a':e.p>0.84,'b':e.p>0.69,'c':e.p>0.49}" ng-style="{width:e.yznums/e.nums*100+'%'}"></u></i>
+						<span class="gray">题量：{{e.nums}}</span>
+					</a>
+				</ol>
+			</li>
+		</ul>
+	</div>
+	<div class="none gray" ng-show="!loading&&!list.length">
+		暂无内容
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

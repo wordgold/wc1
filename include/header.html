@@ -1,7 +1,7 @@
 <header ng-controller="header" class="ng-init">
-	<h1 ng-if="user.title" ng-click="back()" class="title"><i class="i_left"></i>{{user.title | slice : 16}}</h1>
+	<h1 ng-if="user.title" class="title"><i class="i_left" ng-click="back()"></i>{{user.title | slice : 16}}</h1>
 	<h1 ng-if="!user.title" ng-click="user.selectC()">{{user.info.course}} <i class="i_down"></i></h1>
-	<img ng-src="{{user.info.logo||'<!--#echo var="wc1"-->images/avatar.png'}}" class="avatar" ng-click="user.su=true">
+	<i class="i_menu" ng-click="user.su=true"></i>
 	<div class="user" ng-show="user.su">
 		<div class="user_bg" ng-click="user.su=false"></div>
 		<div class="user_r">
@@ -18,10 +18,11 @@
 			<div class="panel">
 				<a href="<!--#echo var="wc1"-->user/car.html"><i class="i_car"></i>查看购物车({{user.info.carcount}})</a>
 				<a href="<!--#echo var="wc1"-->user/order.html"><i class="i_order"></i>我的订单</a>
-				<a href="<!--#echo var="wc1"-->user/class.html"><i class="i_book"></i>我的课程</a>
+				<a href="<!--#echo var="wc1"-->class/list.html?type=3"><i class="i_book"></i>我的课程</a>
 				<a href="<!--#echo var="wc1"-->class/list.html"><i class="i_video"></i>选购课程</a>
 			</div>
 			<div class="panel">
+				<a href="<!--#echo var="wc1"-->user/history.html"><i class="i_book"></i>学习计划</a>
 				<a href="<!--#echo var="wc1"-->user/news.html"><i class="i_news"></i>消息({{user.unread}})</a>
 				<a ng-click="user.selectM()"><i class="i_major"></i>考试科目</a>
 				<a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.sjz.hsh.examquestionbanks"><i class="i_download"></i>下载做题宝APP</a>

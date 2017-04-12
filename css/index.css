@@ -431,15 +431,6 @@ header h1.title{
 	display: block;
 	text-align: center;
 }
-header .title i{
-	position: absolute;
-	left: 0;
-	top: 0;
-	width: 42px;
-	height: 42px;
-	line-height: 42px;
-	text-align: center;
-}
 .avatar{
 	width: 30px;
 	height: 30px;
@@ -447,10 +438,20 @@ header .title i{
 	overflow: hidden;
 	background: #ddd;
 }
-header .avatar{
+header .i_menu,header .i_left{
 	position: absolute;
-	right: 4%;
-	top: 6px;
+	left: 0;
+	top: 0;
+	width: 42px;
+	height: 42px;
+	line-height: 42px;
+	font-size: 20px;
+	text-align: center;
+	color: #fff;
+}
+header .i_menu{
+	left: auto;
+	right: 0;
 }
 .user,.user_bg,.user_r,.major{
 	position: absolute;
@@ -484,6 +485,7 @@ header .avatar{
 	background: #22a7f3;
 }
 .user_t .avatar{
+	position: absolute;
 	left:16px;
 	top: 16px;
 	width: 56px;
@@ -538,7 +540,7 @@ header .avatar{
     background-size: cover;
 }
 .banner .img{
-	height: 99px;
+	height: 200px;
 }
 .banner p{
 	position: absolute;
@@ -597,10 +599,9 @@ header .avatar{
 	position: relative;
 	padding: 9px 4%;
 }
-.ol_qlist  .i_control_point,.ol_qlist  .i_remove_circle_outline{
+.ol_qlist .i_control_point{
 	float: left;
 	font-size: 16px;
-	height: 48px;
 	margin: 4px 4px 0 0;
 }
 .ol_qlist ol{
@@ -614,7 +615,7 @@ header .avatar{
 .ol_qlist .on ol{
 	display: block;
 }
-.ol_qlist ol li{
+.ol_qlist ol .li{
 	padding: 9px 0;
 	margin: 0 0 0 24px;
 }
@@ -628,6 +629,10 @@ header .avatar{
 	border: 0;
 	border-right: 1px #ccc solid;
 }
+.ol_qlist span.fr{
+	min-width: 0;
+	margin: 0;
+}
 .ol_qlist .i_circle{
 	position: absolute;
 	left: -22px;
@@ -639,7 +644,7 @@ header .avatar{
 	background: #fff
 }
 .dlist a{
-	height: 80px;
+	min-height: 80px;
 }
 .dlist img{
 	float: left;
@@ -719,14 +724,13 @@ header .avatar{
 	border-top: 1px #ccc solid;
 	box-shadow: 0 0 4px #ddd;
 	z-index: 9;
+	text-align: center;
 }
 .test_nav label{
-	display: block;
+	display: inline-block;
 	box-sizing: border-box;
-	min-width: 40px;
-	padding: 0 9px;
+	padding: 0 8px;
 	font-size: 14px;
-	text-align: center;
 }
 .q_footer,.q_footer .h3{
 	font-size: 14px;
@@ -925,6 +929,7 @@ header .avatar{
 	height:66px;
 	line-height: 66px;
 	text-align: center;
+	color: #aaa;
 }
 .carlist .i_trash{
 	left: auto;
@@ -932,14 +937,14 @@ header .avatar{
 }
 .carlist label{
 	float: left;
-	width: 40px;
+	width: 60px;
 	height: 69px;
 	line-height: 69px;
 	text-align: center;
 }
 .carlist div{
 	position: absolute;
-	right: -80px;
+	right: -120px;
 	top: 0;
 	transition: right ease-out .2s;
 }

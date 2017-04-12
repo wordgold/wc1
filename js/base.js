@@ -22,12 +22,6 @@ base.value('QType', [{
 	update: "simuldb",
 	info: "SimulOne",
 	name: "模拟考试"
-}]).value('CType', [{
-	name: "视频课程",
-	type: 1
-}, {
-	name: "面授课程",
-	type: 2
 }]);
 base.filter("slice", function() {
 	return function(s, l) {
@@ -79,6 +73,11 @@ base.service("user", function($http) {
 	$http.post(service + "wxuser/checkUserinfo")
 		.then(function(r) {
 			if (r.data.code == 200) {
+				$http.post(service + "wxuser/checkUserPw")
+					.then(function(r) {
+						if (r.data.code == -1)
+							location.href = "<!--#echo var="wc1"-->password.html?href=" + encodeURIComponent(location.href);
+					});
 				s.info = r.data.list[0];
 				if (!s.info.mid)
 					s.selectM()
@@ -87,7 +86,7 @@ base.service("user", function($http) {
 				else
 					s.fire();
 			} else
-				location.href = '<!--#echo var="wc1"-->bind.html?href=' + encodeURIComponent(location.href);
+				location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx727973ddd3d1c2fb&redirect_uri=http%3A%2F%2Fwx.zkjan.com%2Fkstk-api%2Fwxuser%2FgetToken?&response_type=code&scope=snsapi_userinfo&state=h_' + encodeURIComponent(location.href) + '#wechat_redirect'
 		});
 	s.selectC = function() {
 		s.sc = true;
@@ -347,13 +346,17 @@ base.controller('qlist', function($scope, $http, fac, user, hash, QType) {
 	}
 })
 
-base.controller('clist', function($scope, $http, fac, user, hash, CType) {
-	$scope.nlist = CType;
-	$scope.nlist.push({
+base.controller('clist', function($scope, $http, fac, user, hash) {
+	$scope.nlist = [{
+		name: "视频课程",
+		type: 1
+	}, {
+		name: "面授课程",
+		type: 2
+	}, {
 		name: "我的课程",
-		href: '<!--#echo var="wc1"-->user/class.html',
-		type: 0
-	});
+		type: 3
+	}];
 	user.bind(function() {
 		$scope.get(1, true);
 	})
@@ -365,7 +368,7 @@ base.controller('clist', function($scope, $http, fac, user, hash, CType) {
 	$scope.loading = true;
 
 	$scope.setType = function(type) {
-		if (type && $scope.rt.type != type) {
+		if ($scope.rt.type != type) {
 			$scope.rt.type = type;
 			$scope.get(1, true);
 		}
@@ -378,7 +381,10 @@ base.controller('clist', function($scope, $http, fac, user, hash, CType) {
 			$scope.list = [];
 			$scope.loading = true;
 			$scope.page.index = i;
-			$http.post(service + "gradeFront/getGradeByCid?page=" + $scope.page.index + "&rows=" + $scope.rows + "&mid=" + user.info.mid + "&cid=" + user.info.cid)
+			var url = service + ($scope.rt.type == 1 ? "gradeFront/getGradeByCid" : "webuser/getMyGrade") + "?page=" + $scope.page.index + "&rows=" + $scope.rows;
+			if ($scope.rt.type == 1)
+				url += "&mid=" + user.info.mid + "&cid=" + user.info.cid;
+			$http.post(url)
 				.then(function(r) {
 					$scope.loading = false;
 					if (r.data.code == 200) {
@@ -390,41 +396,43 @@ base.controller('clist', function($scope, $http, fac, user, hash, CType) {
 	}
 })
 
-base.controller('myclass', function($scope, $http, fac, user, hash, CType) {
-	$scope.nlist = CType;
-	user.title = "我的课程";
+base.controller('history', function($scope, $http, fac, user, hash) {
+	$scope.nlist = [{
+		name: "观看视频",
+		type: 1
+	}, {
+		name: "练习试题",
+		type: 2
+	}];
+	user.bind(function() {
+		$scope.get();
+	})
 	$scope.rt = hash.init({
 		type: $scope.nlist[0].type
 	});
-	$scope.rows = 20;
-	$scope.page = {};
-	$scope.loading = false;
-	$scope.list = [];
+	$scope.loading = true;
 
 	$scope.setType = function(type) {
-		if (type && $scope.rt.type != type) {
+		if ($scope.rt.type != type) {
 			$scope.rt.type = type;
-			$scope.get(1, true);
+			$scope.get();
 		}
 	};
 	$scope.get = function(i, b) {
-		if ($scope.rt.type == 2) {
-			$scope.loading = false;
-			$scope.list = [];
-		} else if (b || i != $scope.page.index) {
-			$scope.loading = true;
-			$scope.page.index = i;
-			$http.post(service + "webuser/getMyGrade?page=" + $scope.page.index + "&rows=" + $scope.rows)
-				.then(function(r) {
-					$scope.loading = false;
-					if (r.data.code == 200) {
-						$scope.list = r.data.list;
-						$scope.page = fac.page($scope.page.index, $scope.rows, r.data.total)
+		$scope.list = [];
+		$scope.loading = true;
+		$http.post(service + "webuser/" + (hash.type==2 ? "getMyGradeExam" : "getMyPlanGrade") + "?rows=99&mid=" + user.info.mid + "&cid=" + user.info.cid)
+			.then(function(r) {
+				$scope.loading = false;
+				if (r.data.code == 200) {
+					$scope.list = r.data.list;
+					for (var i = $scope.list.length; i --; ) {
+						if(!$scope.list[i].jdlist.length)
+							$scope.list.splice(i,1)
 					}
-				});
-		}
+				}
+			});
 	}
-	$scope.get(1);
 })
 
 base.controller('order', function($scope, $http, fac, user, hash) {
@@ -582,7 +590,11 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 		else if ($scope.ti + 1 < $scope.list.length) {
 			$scope.t = $scope.list[++$scope.ti];
 			$scope.s = $scope.t.question[$scope.si = 0];
+		}else if(!$scope.hideNext){
+			$scope.viewCard();
+			$scope.submit_show = $scope.hideNext = true;
 		}
+
 	}
 	$scope.prev = function() {
 		if ($scope.si)
@@ -617,21 +629,26 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 		$scope.time_stoped ? $scope.timePlay() : $scope.timeStop();
 	}
 
-	angular.forEach(QType, function(v, i) {
-		if ($scope.rt.type == v.type) {
-			$scope.rt.get = v.get;
-			$scope.rt.update = v.update;
-			if (i)
-				$http.get(service + "exam/get" + v.info + "ById?sid=" + $scope.rt.sid)
-				.then(function(r) {
-					if (r.data.code == 200) {
-						$scope.info = r.data.list[0];
-					}
-				});
-			else
-				$scope.showBtn = $scope.started = true;
-		}
-	})
+	if($scope.rt.type == "grade"){
+		$scope.rt.get = "GradeQuestion";
+		$scope.rt.update = "gradedb";
+		$scope.showBtn = $scope.started = true;
+	}else
+		angular.forEach(QType, function(v, i) {
+			if ($scope.rt.type == v.type) {
+				$scope.rt.get = v.get;
+				$scope.rt.update = v.update;
+				if (i)
+					$http.get(service + "exam/get" + v.info + "ById?sid=" + $scope.rt.sid)
+					.then(function(r) {
+						if (r.data.code == 200) {
+							$scope.info = r.data.list[0];
+						}
+					});
+				else
+					$scope.showBtn = $scope.started = true;
+			}
+		})
 	$http.post(service + "exam/get" + $scope.rt.get + "?" + ($scope.rt.sid ? "sid=" + $scope.rt.sid : "cid=" + $scope.rt.cid))
 		.then(function(r) {
 			if (r.data.code == 200) {
@@ -674,8 +691,12 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 	$scope.goVote = function(s, aid) {
 		s.checked = (s.question_type_id == 1 || !s.checked) ? "" + aid : split(aid, s.checked);
 		getResult(s);
-		if (s.question_type_id == 1)
-			$timeout($scope.next, 99);
+		if (s.question_type_id == 1) {
+			if ($scope.time == "0:00")
+				s.showA = true;
+			else
+				$timeout($scope.next, 99);
+		}
 		$http.get(service + "exam/update" + $scope.rt.update + "byqid?id=" + s.qid + "&answers=" + s.checked)
 	}
 
@@ -845,8 +866,13 @@ base.controller('item', function($scope, $http, $timeout, fac, user, hash) {
 			if (r.data.code == 200) {
 				$scope.info = r.data.list;
 				document.title = user.title = $scope.info.name;
-				if (!$scope.rt.vid)
-					$scope.getVideo($scope.info.flist[0].id)
+				if ($scope.rt.vid) {
+					for (var i = $scope.info.flist.length; i--;) {
+						if ($scope.info.flist[i].id == $scope.rt.vid)
+							$scope.getVideo($scope.info.flist[i], true)
+					}
+				} else
+					$scope.getVideo($scope.info.flist[0])
 				$http.post(service + "gradeFront/getVideoBygid?gid=" + $scope.info.parent_id)
 					.then(function(r) {
 						if (r.data.code == 200) {
@@ -867,13 +893,33 @@ base.controller('item', function($scope, $http, $timeout, fac, user, hash) {
 					});
 			}
 		});
-	$scope.getVideo = function(id, b) {
-		if (b || id != $scope.rt.vid) {
-			$http.post(service + "gradeFront/getByVId?gid=" + $scope.rt.gid + "&vid=" + id)
+	var adde = true,
+		n = 0;
+	$scope.getVideo = function(v, b) {
+		if (b || v.id != $scope.rt.vid) {
+			document.title = user.title = v.name;
+			$http.post(service + "gradeFront/getByVId?gid=" + $scope.rt.gid + "&vid=" + v.id)
 				.then(function(r) {
 					if (r.data.code == 200) {
-						$scope.rt.vid = id;
+						$scope.rt.vid = v.id;
 						$scope.video = r.data.url;
+						document.body.scrollTop = 0;
+						if (adde) {
+							var $video = document.getElementById('vo');
+							$video.addEventListener("error", function(err) {
+				                alert(JSON.stringify(err)+$video.error.code+"-"+$video.error.message);
+				            });
+							$video.addEventListener("timeupdate", function() {
+								n++;
+								if (n % 99 == 0) {
+									$http.post(service + "gradeFront/upVideoPro?vid=" + $scope.rt.vid + "&current_time=" + $video.currentTime + "&total_time=" + $video.duration)
+								}
+							})
+							$video.addEventListener("pause", function() {
+								$http.post(service + "gradeFront/upVideoPro?vid=" + $scope.rt.vid + "&current_time=" + $video.currentTime + "&total_time=" + $video.duration)
+							})
+							adde = false;
+						}
 					} else
 						alert(r.data.msg)
 				});
@@ -1027,8 +1073,27 @@ base.controller('bind', function($scope, $http, $interval, hash, fac) {
 		$http.post(service + "wxuser/bdPhone", fac.serialize($scope.user))
 			.then(function(r) {
 				$scope.errMsg = r.data.msg;
+				if (r.data.code == 200){
+					$http.post(service + "wxuser/checkUserPw")
+						.then(function(r) {
+							if (r.data.code == 200)
+								location.href = hash.href || "<!--#echo var="wc1"-->class/list.html";
+							else
+								location.href = "<!--#echo var="wc1"-->password.html?href=" + hash.href;
+						});
+				}
+			});
+	}
+})
+
+base.controller('password', function($scope, $http, hash, fac) {
+	$scope.sub = function() {
+		$scope.errMsg = "正在请求，请稍候…"
+		$http.post(service + "wxuser/upUserPw", fac.serialize($scope.user))
+			.then(function(r) {
+				$scope.errMsg = r.data.msg;
 				if (r.data.code == 200)
-					location.href = hash.href;
+					location.href = hash.href || "<!--#echo var="wc1"-->class/list.html";
 			});
 	}
 })

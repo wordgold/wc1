@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'ic';
   src:
-    url('fonts/ic.ttf?wt4jsa') format('truetype'),
-    url('fonts/ic.woff?wt4jsa') format('woff'),
-    url('fonts/ic.svg?wt4jsa#ic') format('svg');
+    url('fonts/ic.ttf?f8k2sj') format('truetype'),
+    url('fonts/ic.woff?f8k2sj') format('woff'),
+    url('fonts/ic.svg?f8k2sj#ic') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -37,6 +37,9 @@ i {
 }
 .i_trash:before {
   content: "\e109";
+}
+.i_menu:before {
+  content: "\e120";
 }
 .i_download:before {
   content: "\e122";

@@ -9,16 +9,41 @@
 <!--#include virtual="/include/banner.html"-->
 <div ng-controller="clist" class="ng-init">
 	<!--#include virtual="/include/nav.html"-->
-	<div class="dlist panel" ng-if="rt.type==nlist[0].type&&list.length">
+	<div class="dlist panel" ng-if="rt.type==1&&list.length">
 		<a class="li" ng-repeat="s in list" ng-href="<!--#echo var="wc1"-->class/item.html?mid={{s.major_id}}&cid={{s.course_id}}&gid={{s.id}}">
 			<img ng-src="{{s.imgurl}}">
 			{{s.name|slice:14}} <br>
-			<span class="gray">{{s.content|slice:18}}</span><br>
+			<span class="gray" style="display: inline;">{{s.content|slice:18}}</span><br>
 			<span class="gray">{{s.vnums||0}}课时</span><b class="orange">￥{{s.cmoney}}</b>
 		</a>
 	</div>
+	<div ng-if="rt.type==2" class="panel">
+		<h3 class="h3"><i class="i_news"></i>下期开课通知</h3>
+		<div class="content"><p>中科建安教育2017年注册安全工程师第二期特训班于（2017年3月11日-3月15日）在石家庄圆满结束</p>
+		<p>中科建安教育2017年注册安全工程师第三期特训班将于（2017年4月14日-4月17日）在北京开班</p>
+		<p>中科建安教育2017年注册安全工程师第四期特训班将于（2017年4月22日-4月26日）在南京开班</p></div>
+	</div>
+	<div ng-if="rt.type==3&&list.length">
+		<div class="dlist panel" ng-repeat="s in list">
+			<h3 class="h3"><i class="i_video"></i>{{s.major_name}}-{{s.glist?s.name:s.course_name}}</h3>
+			<a class="li" ng-if="!s.glist" ng-href="<!--#echo var="wc1"-->class/item.html?mid={{s.major_id}}&cid={{s.course_id}}&gid={{s.id}}">
+				<img ng-src="{{s.imgurl}}">
+				{{s.name|slice:14}} <br>
+				<span class="gray">{{s.able?'已过期':'有效期至'}}：{{s.end_time}}</span><br>
+				<span class="gray">{{s.vnums||0}}课时</span>
+			</a>
+			<div ng-if="s.glist">
+				<a class="li" ng-repeat="g in s.glist" ng-href="<!--#echo var="wc1"-->class/item.html?mid={{g.major_id}}&cid={{g.course_id}}&gid={{g.id}}">
+					<img ng-src="{{g.imgurl}}">
+					{{g.name|slice:14}} <br>
+					<span class="gray">{{s.able?'已过期':'有效期至'}}：{{s.end_time}}</span><br>
+					<span class="gray">{{g.vnums||0}}课时</span>
+				</a>
+			</div>
+		</div>
+	</div>
 	<!--#include virtual="/include/pagination.html"-->
-	<div class="none gray" ng-show="!loading&&!list.length">
+	<div class="none gray" ng-show="!loading&&!list.length&&rt.type!=2">
 		很抱歉，暂无相关内容
 	</div>
 </div>
