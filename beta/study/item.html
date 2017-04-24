@@ -4,34 +4,45 @@
 <!--#include virtual="/include/head.html"-->
 	<title>班级详情</title>
 </head>
-<body ng-app="baseApp">
+<body ng-app="baseApp" class="hidef">
 <!--#include virtual="/include/header.html"-->
-<div ng-controller="item" class="ng-init" style="margin-bottom: 40px">
-	<div class="no_class" ng-if="!info.flist.length">
+<div ng-controller="item" class="ng-init">
+	<div class="no_class" ng-if="!vlist.length">
 		课程即将开始，请耐心等待……
 		<a href="<!--#echo var="wc1"-->class/list.html" class="b_btn bg_red">查看其他班次</a>
 	</div>
-	<div ng-if="info.flist.length" style="padding-top: 250px;">
+	<div ng-if="vlist.length" style="padding-top: 250px;">
 		<div class="video" style="background-image:url({{info.imgurl}})">
 			<video ng-show="!post" id="vo" ng-src="{{video}}" controls preload autoplay playsinline></video>
 			<!--#include virtual="/include/nav.html"-->
 		</div>
-		<div class="panel" ng-show="rt.type<3">
+		<div class="panel" ng-show="rt.type==1">
 			<h3 class="h3"><i class="i_video"></i>{{info.name | slice:16}} <b class="fr red">￥{{info.cmoney}}</b></h3>
-			<ul class="data" ng-show="rt.type==1">
-				<li><span class="fl">授课教师：</span>{{techers}}</li>
-				<li><span class="fl">课&ensp;&ensp;&ensp;&ensp;时：</span>{{info.flist.length}}课时</li>
+			<ul class="data">
+				<li ng-if="techers"><span class="fl">授课教师：</span>{{techers}}</li>
 				<li><span class="fl">课程特色：</span>{{info.content}}</li>
-				<!-- <li><span class="fl">优惠政策：</span>优惠政策优惠政策优惠政策</li> -->
 			</ul>
-			<ul class="clist" ng-show="rt.type==2">
-				<li ng-repeat="v in info.flist" ng-click="getVideo(v)"><u></u>{{v.name}}
-					<i class="i_pause red" ng-if="v.id==rt.vid"></i>
-					<i class="i_play" ng-if="(!v.is_free||info.buy)&&v.id!=rt.vid"></i>
-					<i class="i_lock" ng-if="(v.is_free&&!info.buy)&&v.id!=rt.vid"></i>
-				</li>
-			</ul>
+			<div ng-bind-html="html(info.description)" style="margin: 20px 4%">
+			</div>
 		</div>
+		<ul class="ol_qlist qlist panel" ng-show="rt.type==2">
+			<li class="li" ng-repeat="g in vlist" ng-class="{'on':info.index==$index}">
+				<div ng-click="info.index=info.index==$index?-1:$index">
+					<i ng-show="info.index!=$index" class="i_control_point gray"></i>
+					<i ng-show="info.index==$index" class="i_remove_point blue"></i>
+					<b>{{g.name}}</b> <span class="gray fr" style="margin: 4px 0 0 0">{{g.flist.length}} 课时</span>
+				</div>
+				<ol ng-if="g.flist.length">
+					<hr>
+					<li class="li" ng-repeat="v in g.flist" ng-click="getVideo(v)">
+						<i class="i_circle"></i>{{v.name | slice:20}}
+						<i class="i_pause red fr" style="margin: 6px 4% 0 0" ng-if="v.id==rt.vid"></i>
+						<i class="i_play fr" style="margin: 6px 4% 0 0" ng-if="(!v.is_free||info.buy)&&v.id!=rt.vid"></i>
+						<i class="i_lock fr" style="margin: 6px 4% 0 0" ng-if="(v.is_free&&!info.buy)&&v.id!=rt.vid"></i>
+					</li>
+				</ol>
+			</li>
+		</ul>
 		<div class="panel comment" ng-show="rt.type==3">
 			<h3 class="h3"><i class="i_star red"></i><i class="i_star red"></i><i class="i_star red"></i><i class="i_star red"></i><i class="i_star grayish"></i><span class="red">4.{{random}} 分</span> <a href="javascript:" ng-click="post=true" class="fr">立即评价<i class="i_right"></i></a></h3>
 			<ul class="plist">
@@ -58,7 +69,6 @@
 				</div>
 			</form>
 		</div>
-		{{info.buy}}
 		<div class="fixed" ng-hide="info.buy">
 			<div class="btns">
 				<a href="<!--#echo var="wc1"-->user/car.html"><i class="i_car"></i>购物车({{user.info.carcount||0}})</a>
@@ -66,7 +76,7 @@
 				<label class="bg_red" ng-click="showBuy=true">立即购买</label>
 			</div>
 		</div>
-		<dov class="fixed pinfo" ng-show="showBuy">
+		<div class="fixed pinfo" ng-show="showBuy">
 			<div class="il">
 				<img ng-src="{{pinfo.imgurl}}">
 				<big><b>{{pinfo.name}}</b></big>
@@ -82,7 +92,7 @@
 				<label ng-repeat="p in pinfo.glist" ng-class="{'on':p.check}" ng-click="check(p)">{{p.name}} ￥{{p.cmoney}}</label>
 			</div>
 			<label class="b_btn bg_red"><button ng-disabled="!buyid.length" ng-click="pay(buyid)">确认支付</button></label>
-		</dov>
+		</div>
 	</div>
 </div>
 <!--#include virtual="/include/footer.html"-->

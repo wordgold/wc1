@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>购物车</title>
+</head>
+<body ng-app="baseApp" class="hidef">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="car" class="ng-init">
+	<ul class="carlist panel" ng-if="!loading&&list.length">
+		<li class="li" ng-repeat="g in list" ng-class="{'del':g.del,'check':g.check}">
+			<i class="i_check" ng-click="check(g)"></i>
+			<img ng-src="{{g.imgurl}}">
+			<p>{{g.name}}</p>
+			<p><b class="red">￥{{g.cmoney}}</b></p>
+			<i class="i_trash" ng-click="g.del=true"></i>
+			<div>
+				<label class="bg_red" ng-click="del(g,$index)">删除</label>
+				<label class="bg_blue" ng-click="g.del=false">取消</label>
+			</div>
+		</li>
+	</ul>
+	<div class="loading" ng-show="loading"></div>
+	<div class="none gray" ng-show="!loading&&!list.length">
+		购物车里暂时还没有任何课程<br>
+		现在您可以点击下方按钮
+		<a href="<!--#echo var="wc1"-->study/index.html" class="b_btn bg_red">选购课程</a>
+	</div>
+	<div class="fixed">
+		<div class="btns">
+			<label ng-click="checkAll()"><i class="i_check" ng-class="{'red':checklength == list.length}"></i> 全选</label>
+			<span>合计：<big class="red">￥{{price||0}}</big></span>
+			<label class="bg_red" ng-click="pay()" ng-class="{'disabled':!checklength||paying}">结算{{paying}}</label>
+		</div>
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

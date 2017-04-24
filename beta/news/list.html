@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>最新资讯</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/banner.html"-->
+<div ng-controller="newslist" class="ng-init">
+	<header class="ng-init">
+		<h1>距离考试还有 <span class="newsdate" ng-repeat="i in date">{{i}}</span> 天</h1>
+	</header>
+	<div class="dlist panel">
+		<h4 class="h4_b" style="margin: 9px 4%">最新资讯</h4>
+		<a class="li" ng-repeat="s in list" ng-if="!s.glist" ng-href="<!--#echo var="wc1"-->news/item.html?id={{s.id}}">
+			<img ng-src="{{s.pic_url}}">
+			{{s.title|slice:14}} <br>
+			<span class="gray">{{s.intro|slice:14}}</span> <br>
+			<span class="gray fr" style="margin-top: 8px;">{{s.thisdate}}</span>
+		</a>
+	</div>
+	<div class="none gray" ng-show="!list.length">
+		很抱歉，暂无相关内容
+	</div>
+</div>
+<script src="<!--#echo var="wc1"-->js/zepto.js" type="text/javascript"></script>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

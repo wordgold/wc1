@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>课程题库</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<!--#include virtual="/include/banner.html"-->
+<div ng-controller="home" class="ng-init">
+	<div class="panel" ng-if="news">
+		<h3 class="h3"><i class="i_sound red"></i><a style="color: #333" href="<!--#echo var="wc1"-->news/item.html?id={{news.id}}">{{news.title}}</a></h3>
+	</div>
+	<div class="panel home_nav">
+		<a href="<!--#echo var="wc1"-->study/list.html?type=ChaptersAndSections"><img src="<!--#echo var="wc1"-->images/t1.png">章节练习</a>
+		<a href="<!--#echo var="wc1"-->study/list.html?type=AllReal"><img src="<!--#echo var="wc1"-->images/t2.png">历年真题</a>
+		<a href="<!--#echo var="wc1"-->study/list.html?type=AllSimul"><img src="<!--#echo var="wc1"-->images/t3.png">模拟考试</a>
+		<a href="<!--#echo var="wc1"-->user/question.html"><img src="<!--#echo var="wc1"-->images/t4.png">错题加练</a>
+	</div>
+	<div class="panel">
+		<a href="" class="img" style="height: 99px;background-image: url(<!--#echo var="wc1"-->images/ad1.png)"></a>
+	</div>
+	<div class="home_p">
+		<div class="hlist dlist panel">
+			<h4 class="h4_b">推荐课程</h4>
+			<div class="li" ng-repeat="s in list">
+				<a ng-href="<!--#echo var="wc1"-->study/item.html?mid={{s.major_id}}&cid={{s.course_id}}&gid={{s.id}}">
+					<img ng-src="{{s.imgurl}}">
+					{{s.name|slice:14}} <br>
+					<span class="gray">{{s.content}}</span>
+					<b class="orange">￥{{s.cmoney}}</b>
+				</a>
+				<span class="btn bg_red" ng-click="pay(s.id)">立即报名</span>
+			</div>
+		</div>
+		<div class="hclist panel cf">
+			<h4 class="h4_b">选班学习</h4>
+			<div ng-repeat="s in clist">
+				<a ng-href="<!--#echo var="wc1"-->study/item.html?mid={{s.major_id}}&cid={{s.course_id}}&gid={{s.id}}">
+					<img ng-src="{{s.imgurl}}">
+					{{s.name}} <br>
+					<span class="gray">{{s.content}}</span>
+				</a>
+				<b class="orange">￥{{s.cmoney}}</b>
+				<span class="btn bg_red" ng-click="pay(s.id)">立即报名</span>
+			</div>
+		</div>
+		<div class="panel">
+			<h4 class="h4_b">师资介绍</h4>
+			<p class="gray">中科建安教育特聘教授级命题导师进行专业指导，重点、考点清晰呈现，助您顺利通过考试。</p>
+			<div id="swipe_h1" class="swipe_b">
+				<div class="swipe">
+					<div class="l_teacher fl" ng-repeat="s in ht_list">
+						<div class="img" style="height:200px;background-image:url({{s.logo}})"></div>
+						<h5><span>{{s.name}}</span></h5>
+						{{s.info | slice:36}}<br>主讲课程：{{s.course | slice:32}}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel">
+			<h4 class="h4_b">学员评价</h4>
+			<ul class="plist" style="margin: 0">
+				<li class="li">
+					<img ng-src="{{c.logo||'<!--#echo var="wc1"-->images/ad/1.jpg'}}" class="avatar">
+					<h4 class="gray">阿勇</h4>
+					<p>老师讲的很好，结合真题，帮助记忆。上岁数了记忆力减退，还是得按老师的方法有效果。</p>
+				</li>
+				<li class="li">
+					<img ng-src="{{c.logo||'<!--#echo var="wc1"-->images/ad/2.jpg'}}" class="avatar">
+					<h4 class="gray">光</h4>
+					<p>经过几次特训班学习，心里有底了。</p>
+				</li>
+				<li class="li">
+					<img ng-src="{{c.logo||'<!--#echo var="wc1"-->images/ad/3.jpg'}}" class="avatar">
+					<h4 class="gray">deepblue</h4>
+					<p>在网上学习很方便，随时随地打开就可以看视频做题。工作太忙没时间参加面授培训。</p>
+				</li>
+				<li class="li">
+					<img ng-src="{{c.logo||'<!--#echo var="wc1"-->images/ad/4.jpg'}}" class="avatar">
+					<h4 class="gray">lazhaca蕾木</h4>
+					<p>以前对你们有些怀疑，参加了两次培训会以后，觉得咱们很专业，相信我的选择没有错。</p>
+				</li>
+				<li class="li">
+					<img ng-src="{{c.logo||'<!--#echo var="wc1"-->images/ad/5.jpg'}}" class="avatar">
+					<h4 class="gray">妮宸</h4>
+					<p>平时没事儿的时候打开题做一做，慢慢就掌握了。</p>
+				</li>
+				<li class="li">
+					<img ng-src="{{c.logo||'<!--#echo var="wc1"-->images/ad/6.jpg'}}" class="avatar">
+					<h4 class="gray">浅月朦胧</h4>
+					<p>特别感谢一下中科建安李老师，从报名到学习到考试一点都没有放松，有的时候我都不好意思了。</p>
+				</li>
+				<li class="li">
+					<img ng-src="{{c.logo||'<!--#echo var="wc1"-->images/ad/7.jpg'}}" class="avatar">
+					<h4 class="gray">守艺人</h4>
+					<p>这次能顺利通过考试除了自己的努力，老师的指点尤为重要。很多考点光靠自己无法真正的去领会，只有跟随老师的方法才能熟练掌握。我在复习过程中也遇到了不少困难，有的时候很烦躁不想学习。教研老师的指导能让我静下心来学。考过的感觉不错，希望大家都能通过考试吧。</p>
+				</li>
+				<li class="li">
+					<img ng-src="{{c.logo||'<!--#echo var="wc1"-->images/ad/8.jpg'}}" class="avatar">
+					<h4 class="gray">天空中行走的云</h4>
+					<p>思路很清晰，复杂的知识点讲出来很透。</p>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<script src="<!--#echo var="wc1"-->js/zepto.js" type="text/javascript"></script>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

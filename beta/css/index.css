@@ -5,7 +5,7 @@ html {
 body {
 	background: #f4f4f4;
 	margin: 0;
-	padding: 42px 0 0 0;
+	padding: 42px 0 50px 0;
 	color: #444;
 	font: 400 12px/1.8 Verdana, sans-serif
 }
@@ -261,6 +261,9 @@ h2.panel{
 .panel .h3{
 	padding: 0 4%;
 }
+.panel .h3:last-child{
+	border: 0;
+}
 .r_panel{
 	padding: 9px 4%;
 	margin: 1em 4%;
@@ -284,6 +287,13 @@ h2.panel{
 .h4{
 	font-size: 14px;
 	padding: 0 4%;
+}
+.h4_b{
+	margin: 9px 0;
+	padding: 0 9px;
+	border-left: 4px #22a7f3 solid;
+	font-size: 16px;
+	font-weight: bold;
 }
 .none{
 	padding: 120px 0 0 0;
@@ -425,13 +435,10 @@ header{
 	z-index: 49;
 }
 header h1{
-	display: inline-block;
+	display: block;
 	margin: 0 4%;
 	color: #fff;
 	font-size: 16px;
-}
-header h1.title{
-	display: block;
 	text-align: center;
 }
 .avatar{
@@ -456,36 +463,55 @@ header .i_menu{
 	left: auto;
 	right: 0;
 }
-.user,.user_bg,.user_r,.major{
-	position: absolute;
+.hidef .footer{
+	display: none;
+}
+.footer{
+	height: 50px;
+	border-top: 1px #ddd solid;
+	text-align: center;
+}
+.footer img{
+	height: 21px;
+	margin: 4px auto;
+}
+.footer img,.footer .on img.h{
+	display: block;
+}
+.footer img.h,.footer .on img{
+	display: none;
+}
+.footer a{
+	display: inline-block;
+	width: 24%;
+	line-height: 20px;
+	color: #666;
+}
+.footer a.on{
+	color: #22a7f3;
+}
+.major{
+	position: fixed;
 	top: 0;
 	right: 0;
 	width: 100%;
 	height: 100%;
 	overflow: auto;
 }
-.user,.major{
-	position: fixed;
-}
-.on .user{
-	display: block;
-}
-.user_bg{
-	background: rgba(0,0,0,.2);
-}
-.user_r{
-	width: 64%;
-	font-size: 14px;
-	background: #f4f4f4;
-	box-shadow: 0 0 99px #000;
-}
 .user_t{
 	display: block;
 	height: 90px;
+	font-size: 16px;
 	line-height: 24px;
 	padding: 0 0 0 90px;
 	color: #fff;
 	background: #22a7f3;
+}
+.user_t .i_right{
+	position: absolute;
+	right: 4%;
+	top: 35px;
+	font-size: 20px;
 }
 .user_t .avatar{
 	position: absolute;
@@ -498,11 +524,13 @@ header .i_menu{
 .user_t h2{
 	color: inherit;
 	padding: 20px 0 0 0;
-	font-size: 16px;
+	font-size: 18px;
 }
 .user .panel a{
 	display: block;
-	margin: 0 0 0 16px;
+	font-size: 16px;
+	line-height: 40px;
+	margin: 0 0 0 48px;
 	color: #666;
 	border-bottom: 1px #ddd solid;
 }
@@ -510,7 +538,8 @@ header .i_menu{
 	border: 0;
 }
 .user .panel i{
-	margin: 0 9px 0 0;
+	margin: 11px 9px 0 -28px;
+	float: left;
 }
 .major{
 	background: #f4f4f4;
@@ -538,7 +567,7 @@ header .i_menu{
 }
 .img{
     display: block;
-    background-position: 50% 50%;
+    background-position: 50% 0;
     background-repeat: no-repeat;
     background-size: cover;
 }
@@ -1030,7 +1059,6 @@ header .i_menu{
 	color: #999;
 }
 .content p{
-	text-indent: 2em;
 	font-size: 14px;
 	margin: 9px 4%;
 }
@@ -1043,9 +1071,127 @@ header .i_menu{
 .news .content,.newstime{
 	padding: 20px 4%;
 }
+.news .content p{
+	margin: 9px 0;
+}
+.newstime{
+	display: block;
+	text-align: right;
+}
 .news .h3{
 	height: auto;
 	padding: 9px 4%;
 	line-height: 32px;
 }
+.newsdate{
+	display: inline-block;
+	width: 20px;
+	height: 28px;
+	line-height: 28px;
+	margin: 0 2px;
+	text-align: center;
+	font-size: 20px;
+	color: #a00;
+	vertical-align: middle;
+	background: #fff;
+	border-radius: 4px;
+}
 /*news o*/
+/*home s*/
+.home_nav{
+	text-align: center;
+	padding: 9px 0;
+}
+.home_nav a{
+	display: inline-block;
+	width: 24%;
+	color: #333;
+	font-size: 14px;
+}
+.home_nav img{
+	display: block;
+	width: 50px;
+	margin: 4px auto;
+}
+.home_p .panel{
+	padding: 1px 4%;
+}
+.l_teacher{
+	margin: 9px 0;
+	font-size: 14px;
+}
+.l_teacher h5{
+	border-top: 1px #22a7f3 solid;
+	height: 2px;
+	text-align: center;
+	margin: 20px 0;
+}
+.l_teacher h5 span{
+	display: inline-block;
+	position: relative;
+	top: -14px;
+	padding: 0 20px;
+	background: #fff;
+}
+.l_teacher h5 span:after,.l_teacher h5 span:before{
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 9px;
+	width: 9px;
+	height: 9px;
+	overflow: hidden;
+	content: " ";
+	background: #22a7f3;
+	transform: rotate(45deg);
+}
+.l_teacher h5 span:after{
+	left: auto;
+	right: 0;
+}
+.hlist .li{
+	padding: 9px 0;
+	min-height: 99px;
+}
+.hlist img{
+	height: 99px;
+	width: 139px;
+}
+.hlist span.gray{
+	display: block;
+	height: 40px;
+	margin: 4px 0;
+}
+.hlist .btn{
+	position: absolute;
+	right: 0;
+	bottom: 9px;
+}
+.hclist div{
+	float: left;
+	position: relative;
+	width: 44%;
+	min-height: 240px;
+	margin: 12px 0 0 0;
+}
+.hclist div:nth-of-type(odd){
+	float: right;
+}
+.hclist img{
+	display: block;
+	width: 100%;
+}
+.hclist a{
+	display: block;
+	font-size: 14px;
+	color: #333;
+}
+.hclist span.gray{
+	display: block;
+	font-size: 12px;
+	margin: 4px 0;
+}
+.hclist .btn{
+	float: right;
+}
+/*home o*/

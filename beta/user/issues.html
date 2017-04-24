@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>意见反馈</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="issues" class="ng-init">
+	<form class="form" ng-submit="sub()" name="user" novalidate autocomplete="off">
+		<ul class="panel">
+			<li class="li"><input type="hidden" name="aid" ng-model="aid">
+				<textarea id="issues" class="txt" ng-model="con" name="con" required placeholder="亲，欢迎您留下问题和建议，谢谢！"></textarea></li>
+		</ul>
+		<a href="javascript:" class="bg_red b_btn"><button type="submit" ng-disabled="user.$invalid">提交反馈</button></a>
+	</form>
+	<div ng-show="errMsg" class="alert">
+		<div class="r_panel">
+			<h4>{{errMsg}}</h4>
+		</div>
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

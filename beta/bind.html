@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>绑定手机</title>
+</head>
+<body ng-app="baseApp" class="hidef">
+<div ng-controller="bind" class="ng-init">
+	<div class="panel content">
+		<p>绑定手机可以同步您的学习记录,多平台登录中科建安教育网，免费观看名师讲解，随时随地练习试题。</p>
+	</div>
+	<form class="form" ng-submit="sub()" name="user" autocomplete="off">
+		<ul class="panel">
+			<li class="li">
+				<label for="phone" class="f_i"><big class="red">*</big>手&emsp;机</label>
+				<input id="phone" type="text" class="txt" ng-model="phone" name="phone" required vphone placeholder="请输入手机号码"></li>
+			<li class="li">
+				<label for="code" class="f_i"><big class="red">*</big>验证码</label>
+				<input id="code" maxlength="4" minlength="4" type="text" class="txt" ng-model="code" name="code" required placeholder="请输入短信里的验证码">
+				<label class="btn disabled" ng-click="send(user.phone.$modelValue)" ng-class="{'disabled':user.phone.$invalid||sended}" ng-bind="sended?'等待 '+s+' 秒…':'获取短信'"></label></li>
+		</ul>
+		<label class="bg_red b_btn"><button type="submit" ng-disabled="user.$invalid">提交</button></label>
+	</form>
+	<div ng-show="errMsg" class="r_panel red" style="text-align: center;font-size: 14px;" ng-bind="errMsg">
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>
