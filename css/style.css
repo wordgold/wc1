@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'ic';
   src:
-    url('fonts/ic.ttf?f8k2sj') format('truetype'),
-    url('fonts/ic.woff?f8k2sj') format('woff'),
-    url('fonts/ic.svg?f8k2sj#ic') format('svg');
+    url('fonts/ic.ttf?c2ctux') format('truetype'),
+    url('fonts/ic.woff?c2ctux') format('woff'),
+    url('fonts/ic.svg?c2ctux#ic') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -23,6 +23,12 @@ i {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.i_write:before {
+  content: "\e908";
+}
+.i_sound:before {
+  content: "\e909";
+}
 .i_car:before {
   content: "\e905";
 }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>我的课程</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="myclass" class="ng-init">
+	<div class="dlist panel" ng-repeat="s in list">
+		<h3 class="h3"><i class="i_video"></i>{{s.major_name}}-{{s.glist?s.name:s.course_name}}</h3>
+		<a class="li" ng-if="!s.glist" ng-href="<!--#echo var="wc1"-->study/item.html?mid={{s.major_id}}&cid={{s.course_id}}&gid={{s.id}}">
+			<img ng-src="{{s.imgurl}}">
+			{{s.name|slice:14}} <br>
+			<span class="gray">{{s.able?'已过期':'有效期至'}}：{{s.end_time}}</span><br>
+			<span class="gray">{{s.vnums||0}}课时</span>
+		</a>
+		<div ng-if="s.glist">
+			<a class="li" ng-repeat="g in s.glist" ng-href="<!--#echo var="wc1"-->study/item.html?mid={{g.major_id}}&cid={{g.course_id}}&gid={{g.id}}">
+				<img ng-src="{{g.imgurl}}">
+				{{g.name|slice:14}} <br>
+				<span class="gray">{{s.able?'已过期':'有效期至'}}：{{s.end_time}}</span><br>
+				<span class="gray">{{g.vnums||0}}课时</span>
+			</a>
+		</div>
+	</div>
+	<!--#include virtual="/include/pagination.html"-->
+	<div class="none gray" ng-show="!loading&&!list.length&&rt.type!=2">
+		很抱歉，暂无相关内容
+	</div>
+</div>
+<script src="<!--#echo var="wc1"-->js/zepto.js" type="text/javascript"></script>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

@@ -4,7 +4,7 @@
 <!--#include virtual="/include/head.html"-->
 	<title>购物车</title>
 </head>
-<body ng-app="baseApp">
+<body ng-app="baseApp" class="hidef">
 <!--#include virtual="/include/header.html"-->
 <div ng-controller="car" class="ng-init">
 	<ul class="carlist panel" ng-if="!loading&&list.length">
@@ -24,7 +24,7 @@
 	<div class="none gray" ng-show="!loading&&!list.length">
 		购物车里暂时还没有任何课程<br>
 		现在您可以点击下方按钮
-		<a href="<!--#echo var="wc1"-->class/list.html" class="b_btn bg_red">选购课程</a>
+		<a href="<!--#echo var="wc1"-->study/index.html" class="b_btn bg_red">选购课程</a>
 	</div>
 	<div class="fixed">
 		<div class="btns">

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>最新资讯</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="newsitem" class="ng-init panel news">
+	<h3 class="h3"><i class="i_news"></i>{{info.title}}</h3>
+	<div class="content" ng-bind-html="html(info.content)"></div>
+	<span class="gray newstime">{{info.thisdate}}</span>
+</div>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>

@@ -15,7 +15,7 @@
 	<div class="panel news" ng-if="rt.id">
 		<h3 class="h3"><i class="i_news"></i>{{info.title}}</h3>
 		<div class="content" ng-bind-html="html(info.content)"></div>
-		<span class="gray fr newstime">{{info.create_time}}</span>
+		<span class="gray newstime">{{info.create_time}}</span>
 	</div>
 	<div class="none gray" ng-show="!rt.id&&!user.news.length">
 		暂无消息

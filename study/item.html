@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>班级详情</title>
+</head>
+<body ng-app="baseApp" class="hidef">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="item" class="ng-init">
+	<div class="no_class" ng-if="!vlist.length">
+		课程即将开始，请耐心等待……
+		<a href="<!--#echo var="wc1"-->class/list.html" class="b_btn bg_red">查看其他班次</a>
+	</div>
+	<div ng-if="vlist.length" style="padding-top: 250px;">
+		<div class="video" style="background-image:url({{info.imgurl}})">
+			<video ng-show="!post" id="vo" ng-src="{{video}}" controls preload autoplay playsinline></video>
+			<!--#include virtual="/include/nav.html"-->
+		</div>
+		<div class="panel" ng-show="rt.type==1">
+			<h3 class="h3"><i class="i_video"></i>{{info.name | slice:16}} <b class="fr red">￥{{info.cmoney}}</b></h3>
+			<ul class="data">
+				<li ng-if="techers"><span class="fl">授课教师：</span>{{techers}}</li>
+				<li><span class="fl">课程特色：</span>{{info.content}}</li>
+			</ul>
+			<div ng-bind-html="html(info.description)" style="margin: 20px 4%">
+			</div>
+		</div>
+		<ul class="ol_qlist qlist panel" ng-show="rt.type==2">
+			<li class="li" ng-repeat="g in vlist" ng-class="{'on':info.index==$index}">
+				<div ng-click="info.index=info.index==$index?-1:$index">
+					<i ng-show="info.index!=$index" class="i_control_point gray"></i>
+					<i ng-show="info.index==$index" class="i_remove_point blue"></i>
+					<b>{{g.name | slice:12}}</b> <span class="gray fr" style="margin: 4px 0 0 0">{{g.flist.length}} 课时</span>
+				</div>
+				<ol ng-if="g.flist.length">
+					<hr>
+					<li class="li" ng-repeat="v in g.flist" ng-click="getVideo(v)">
+						<i class="i_circle"></i>{{v.name | slice:20}}
+						<i class="i_pause red fr" style="margin: 6px 4% 0 0" ng-if="v.id==rt.vid"></i>
+						<i class="i_play fr" style="margin: 6px 4% 0 0" ng-if="(!v.is_free||info.buy)&&v.id!=rt.vid"></i>
+						<i class="i_lock fr" style="margin: 6px 4% 0 0" ng-if="(v.is_free&&!info.buy)&&v.id!=rt.vid"></i>
+					</li>
+				</ol>
+			</li>
+		</ul>
+		<div class="panel comment" ng-show="rt.type==3">
+			<h3 class="h3"><i class="i_star red"></i><i class="i_star red"></i><i class="i_star red"></i><i class="i_star red"></i><i class="i_star grayish"></i><span class="red">4.{{random}} 分</span> <a href="javascript:" ng-click="post=true" class="fr">立即评价<i class="i_right"></i></a></h3>
+			<ul class="plist">
+				<li class="li" ng-repeat="c in clist">
+					<img ng-src="{{c.logo||'<!--#echo var="wc1"-->images/avatar.png'}}" class="avatar">
+					<h4 class="gray">{{c.nickname||'网友'}} <span class="fr">{{c.thistime}}</span></h4>
+					<p>{{c.content}}</p>
+				</li>
+			</ul>
+		</div>
+		<div ng-show="post" class="alert">
+			<form class="form r_panel" ng-submit="sub()" name="form" autocomplete="off">
+				<ul>
+					<li class="li">
+						<label for="nickname" class="f_i">评分</label>
+						<div><i class="i_star" ng-repeat="i in stars" ng-click="$parent.star=i" ng-class="{'red':star>$index,'grayish':star<i}"></i></div></li>
+					<li class="li">
+						<textarea class="txt" name="comment" ng-model="$parent.comment" required placeholder="请输入评价内容"></textarea></li>
+					<li class="li red" ng-show="errMsg">{{errMsg}}</li>
+				</ul>
+				<div class="btns">
+					<label class="b_btn" ng-click="post=false">关 闭</label>
+					<label class="bg_red b_btn"><button type="submit" ng-disabled="form.$invalid">发表评价</button></label>
+				</div>
+			</form>
+		</div>
+		<div class="fixed" ng-hide="info.buy">
+			<div class="btns">
+				<a href="<!--#echo var="wc1"-->user/car.html"><i class="i_car"></i>购物车({{user.info.carcount||0}})</a>
+				<label class="bg_orange" ng-click="user.buy(rt.gid)">{{user.info.added?"已":""}}加入购物车</label>
+				<label class="bg_red" ng-click="showBuy=true">立即购买</label>
+			</div>
+		</div>
+		<div class="fixed pinfo" ng-show="showBuy">
+			<div class="il">
+				<img ng-src="{{pinfo.imgurl}}">
+				<big><b>{{pinfo.name}}</b></big>
+				<b class="red">￥{{price}}</b><span class="gray" ng-show="pinfo.check">（整套购买优惠￥{{pinfo.ymoney}}）</span>
+				<i class="i_cross" ng-click="showBuy=false"></i>
+			</div>
+			<div class="il">
+				<big>整套购买</big>
+				<label ng-class="{'on':pinfo.check}" ng-click="check(pinfo,true)">{{pinfo.name}} ￥{{pinfo.cmoney}}</label> <span class="gray">（优惠￥{{pinfo.ymoney}}）</span>
+			</div>
+			<div class="il">
+				<big>单科购买</big>
+				<label ng-repeat="p in pinfo.glist" ng-class="{'on':p.check}" ng-click="check(p)">{{p.name}} ￥{{p.cmoney}}</label>
+			</div>
+			<label class="b_btn bg_red"><button ng-disabled="!buyid.length" ng-click="pay(buyid)">确认支付</button></label>
+		</div>
+	</div>
+</div>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<!--#include virtual="/include/footer.html"-->
+</body>
+</html>
