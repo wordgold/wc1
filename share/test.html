@@ -3,55 +3,88 @@
 <head>
 <!--#include virtual="/include/head.html"-->
 	<title>在线免费做题-中科建安教育</title>
+	<style type="text/css">
+		html,body{
+			width: 100%;
+			height: 100%;
+			padding: 0;
+		}
+		.ib{
+			display: block;
+			width: 100%;
+		}
+		.panel, .r_panel{
+			background: transparent;
+		}
+		.r_panel{
+			margin: 0;
+			padding: 0 4%;
+		}
+		.r_panel img{
+			display: block;
+			width: 98px;
+			margin: 20px 0 0 -12px;
+		}
+		.ng-scope.ng-init{
+			opacity: 1;
+			transform: none;
+			transition:all ease-out .4s;
+		}
+	</style>
 </head>
-<body ng-app="baseApp" class="hidef" style="padding: 0;">
-<div ng-controller="shareTest" class="ng-init">
-	<div ng-if="!started" style="padding: 0 0 120px 0;background: #fff url(<!--#echo var="wc1"-->images/share/bg.png) no-repeat 50% 100%;background-size: contain;">
+<body ng-app="baseApp" class="hidef ng-init" ng-controller="shareTest">
+<div ng-if="!started" style="min-height: 100%;display: flex;flex-direction: column;justify-content: space-between;background: #012f8f">
+	<div style="flex-grow:1;background: #fff url(<!--#echo var="wc1"-->images/share/hb.jpg) no-repeat 50% 0;background-size: contain;">
 		<img src="<!--#echo var="wc1"-->images/share/header.png" style="display:block;width:96%;margin:0 auto;padding:20px 0">
-		<h2 class="panel" style="padding: 0 4%">{{info.title}}</h2>
-		<label style="display: block;width: 143px;height: 61px;margin: 20px auto;background: #fff url(<!--#echo var="wc1"-->images/share/btn.png);background-size: 100% 100%;" ng-click="$parent.started = true"></label>
+		<h2 class="panel" style="padding: 0 4%"></h2>
 		<div class="r_panel">
-			<h3 class="h3"><i class="i_book"></i>试卷详情</h3>
+			<img src="<!--#echo var="wc1"-->images/share/t1.png">
+			<div style="text-align: center;font-size: 16px;">{{info.title}}</div>
+		</div>
+		<div class="r_panel">
+			<img src="<!--#echo var="wc1"-->images/share/t2.png">
 			<div class="test_t" ng-if="!started" ng-bind-html="html(info.info)"></div>
 		</div>
+		<label style="display: block;margin: 20px auto;width: 164px;height: 73px;background:transparent url(<!--#echo var="wc1"-->images/share/btn.png);background-size: 100% 100%;" ng-click="$parent.started = true"></label>
 	</div>
-	<div ng-show="started" style="padding: 0 0 99px 0;">
-		<div class="loading" ng-if="!geted"></div>
-		<div class="panel" ng-show="geted">
-			<h3 class="h3">{{ti | xyz}}. {{t.question_type_name}} <span class="fr gray">{{si+1}}/{{t.question.length}}</span></h3>
-			<div ng-bind-html="html(si+1+'. '+s.question)" class="q_header"></div>
-			<label class="answer" ng-repeat="a in s.options" ng-click="goVote(s,a.id)" ng-class="{'on':vote(s.checked,a.id,s.question_type_id),'submited':submited,'real':a.is_real}">
-				<span>{{$index | abcd}}</span>
-				<p>{{a.answer}} <img ng-if="a.answer_url" ng-src="{{a.answer_url}}"></p>
-			</label>
-			<div class="test_nav">
-				<label ng-click="prev()"><i ng-show="ti||si" class="i_left"></i></label>
-				<label ng-if="showBtn&&!submited" ng-click="s.showA=!s.showA"><i class="i_light"></i> 解析</label>
-				<label ng-click="next()"><i ng-hide="hideNext" class="i_right"></i></label>
-			</div>
-		</div>
-		<div ng-if="s.showA||submited" class="q_footer panel">
-			<h3 class="h3" ng-if="t.question_type_id<3">
-				参考答案：
-				<span class="green" ng-repeat="a in s.options" ng-if="a.is_real">{{$index | abcd}}</span>
-				<span class="gray fr">统计全平台正确率为 {{pen(s.answer_right,s.answer_num)}}</span>
-			</h3>
-			<div class="q_footer_a" ng-if="s.analysis.analysis" ng-bind-html="html('<span>参考解析：</span>'+s.analysis.analysis)">
-			</div>
-		</div>
-		<div ng-show="showAd" style="position: fixed;left: 0;top: 0;z-index: 999;width: 100%;height: 100%;background: #fff;">
-			<img src="<!--#echo var="wc1"-->images/share/fav.jpg" style="display:block;width:100%;position:absolute;left:0;top:0;">
-			<i class="i_cross" style="position: absolute;right: 9px;top: 9px;font-size: 24px;color: #fff" ng-click="showAd = false"></i>
-		</div>
-	</div>
-	<a href="http://wx.zkjan.com/about/index.html" id="swipe" class="swipe_b banner" style="display:block;width:100%;position:fixed;left:0;z-index:9;transition:all .4s ease-out" ng-style="{bottom:(started&&geted)?'40px':'-120px'}">
-		<div class="swipe">
-			<img width="100%;" src="<!--#echo var="wc1"-->images/share/ad1.jpg" class="fl">
-			<img width="100%;" src="<!--#echo var="wc1"-->images/share/ad2.jpg" class="fl">
-			<img width="100%;" src="<!--#echo var="wc1"-->images/share/ad3.jpg" class="fl">
-		</div>
-	</a>
+	<img src="<!--#echo var="wc1"-->images/share/bg.jpg" class="ib">
 </div>
+<div ng-show="started" style="padding: 0 0 99px 0;background: #fff">
+	<div class="loading" ng-if="!geted"></div>
+	<div class="panel" ng-show="geted">
+		<h3 class="h3">{{ti | xyz}}. {{t.question_type_name}} <span class="fr gray">{{si+1}}/{{t.question.length}}</span></h3>
+		<div ng-bind-html="html(si+1+'. '+s.question)" class="q_header"></div>
+		<label class="answer" ng-repeat="a in s.options" ng-click="goVote(s,a.id)" ng-class="{'on':vote(s.checked,a.id,s.question_type_id),'submited':submited,'real':a.is_real}">
+			<span>{{$index | abcd}}</span>
+			<p>{{a.answer}} <img ng-if="a.answer_url" ng-src="{{a.answer_url}}"></p>
+		</label>
+		<div class="test_nav">
+			<label ng-click="prev()"><i ng-show="ti||si" class="i_left"></i></label>
+			<label ng-if="showBtn&&!submited" ng-click="s.showA=!s.showA"><i class="i_light"></i> 解析</label>
+			<label ng-click="next()"><i ng-hide="hideNext" class="i_right"></i></label>
+		</div>
+	</div>
+	<div ng-if="s.showA||submited" class="q_footer panel">
+		<h3 class="h3" ng-if="t.question_type_id<3">
+			参考答案：
+			<span class="green" ng-repeat="a in s.options" ng-if="a.is_real">{{$index | abcd}}</span>
+			<span class="gray fr">统计全平台正确率为 {{pen(s.answer_right,s.answer_num)}}</span>
+		</h3>
+		<div class="q_footer_a" ng-if="s.analysis.analysis" ng-bind-html="html('<span>参考解析：</span>'+s.analysis.analysis)">
+		</div>
+	</div>
+	<div ng-show="showAd" style="position: fixed;left: 0;top: 0;z-index: 999;width: 100%;height: 100%;background: #fff;">
+		<img src="<!--#echo var="wc1"-->images/share/fav.jpg" style="display:block;width:100%;position:absolute;left:0;top:0;">
+		<i class="i_cross" style="position: absolute;right: 9px;top: 9px;font-size: 24px;color: #fff" ng-click="showAd = false"></i>
+	</div>
+</div>
+<a href="<!--#echo var="wc1"-->study/index.html" id="swipe" class="swipe_b banner" style="display:block;width:100%;position:fixed;left:0;z-index:9;transition:all .4s ease-out" ng-style="{bottom:(started&&geted)?'40px':'-120px'}">
+	<div class="swipe">
+		<img width="100%;" src="<!--#echo var="wc1"-->images/share/ad1.jpg" class="fl">
+		<img width="100%;" src="<!--#echo var="wc1"-->images/share/ad2.jpg" class="fl">
+		<img width="100%;" src="<!--#echo var="wc1"-->images/share/ad3.jpg" class="fl">
+	</div>
+</a>
 <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
 <script src="<!--#echo var="wc1"-->js/zepto.js" type="text/javascript"></script>
 <!--#include virtual="/include/footer.html"-->

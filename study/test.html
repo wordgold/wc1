@@ -29,6 +29,7 @@
 		<div class="panel" ng-show="geted">
 			<h3 class="h3">{{ti | xyz}}. {{t.question_type_name}} <span class="fr gray">{{si+1}}/{{t.question.length}}</span></h3>
 			<div ng-bind-html="html(si+1+'. '+s.question)" class="q_header"></div>
+			<img ng-src="{{s.question_url}}" ng-if="s.question_url" style="display: block;max-width: 100%;margin: 9px auto">
 			<label class="answer" ng-repeat="a in s.options" ng-click="goVote(s,a.id)" ng-class="{'on':vote(s.checked,a.id,s.question_type_id),'submited':submited,'real':a.is_real}">
 				<span>{{$index | abcd}}</span>
 				<p>{{a.answer}} <img ng-if="a.answer_url" ng-src="{{a.answer_url}}"></p>

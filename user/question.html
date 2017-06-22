@@ -12,8 +12,8 @@
 		<li class="li" ng-repeat="s in list">
 			<label class="t" ng-click="show(s)" ng-bind-html="html(s.question.question)"></label>
 			<label ng-click="delStudy(s.qid)"><i class="i_trash"></i></label>
-			<label ng-show="s.question.colled" ng-click="delStar(s.question)"><i class="i_fav_h"></i></label>
-			<label ng-show="rt.type==1&&!s.question.colled" ng-click="addStar(s.question)"><i class="i_fav"></i></label>
+			<label ng-show="s.colled" ng-click="delStar(s)"><i class="i_fav_h"></i></label>
+			<label ng-show="rt.type==1&&!s.colled" ng-click="addStar(s)"><i class="i_fav"></i></label>
 		</li>
 	</ul>
 	<!--#include virtual="/include/pagination.html"-->
@@ -23,18 +23,18 @@
 	<div ng-show="card" class="alert">
 		<div class="r_panel">
 			<div class="max_h">
-				<div ng-bind-html="html(s.question)" class="q_header"></div>
-				<label class="answer submited" ng-repeat="a in s.options" ng-click="goVote(s,a.id)" ng-class="{'on':vote(s.checked,a.id,s.question_type_id),'real':a.is_real}">
+				<div ng-bind-html="html(s.question.question)" class="q_header"></div>
+				<label class="answer submited" ng-repeat="a in s.question.options" ng-click="goVote(s,a.id)" ng-class="{'on':vote(s.question.checked,a.id,s.question.question_type_id),'real':a.is_real}">
 					<span>{{$index | abcd}}</span>
 					<p>{{a.answer}} <img ng-if="a.answer_url" ng-src="{{a.answer_url}}"></p>
 				</label>
 				<div class="q_footer">
 					<h3 class="h3">
 						参考答案：
-						<span class="green" ng-repeat="a in s.options" ng-if="a.is_real">{{$index | abcd}}</span>
-						<span class="gray fr">统计全平台正确率为 {{pen(s.answer_right,s.answer_num)}}</span>
+						<span class="green" ng-repeat="a in s.question.options" ng-if="a.is_real">{{$index | abcd}}</span>
+						<span class="gray fr">统计全平台正确率为 {{pen(s.question.answer_right,s.question.answer_num)}}</span>
 					</h3>
-					<div ng-if="s.analysis.analysis" ng-bind-html="html('<span>参考解析：</span>'+s.analysis.analysis)">
+					<div ng-if="s.question.analysis.question.analysis" ng-bind-html="html('<span>参考解析：</span>'+s.question.analysis.analysis)">
 					</div>
 				</div>
 			</div>

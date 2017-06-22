@@ -7,18 +7,21 @@ base.config(function($httpProvider) {
 });
 base.value('QType', [{
 	type: "ChaptersAndSections",
-	get: "QuestionBySidFront",
+	get: "QuestionBySidFrontWx",
+	one: "ChapterQoneWx",
 	update: "qerrdb",
 	name: "章节练习"
 }, {
 	type: "AllReal",
-	get: "RealQuestion",
+	get: "RealQuestionWx",
+	one: "RealQoneWx",
 	update: "realdb",
 	info: "RealOne",
 	name: "历年真题"
 }, {
 	type: "AllSimul",
-	get: "SimulQuestion",
+	get: "SimulQuestionWx",
+	one: "SimulQoneWx",
 	update: "simuldb",
 	info: "SimulOne",
 	name: "模拟考试"
@@ -63,6 +66,9 @@ base.service("user", function($http) {
 		}
 	getNews();
 	s.need = true;
+	s.info = {
+		mid: 11
+	};
 	s.bind = function(e) {
 		es.push(e);
 	};
@@ -320,30 +326,25 @@ base.controller('header', function($scope, user, hash) {
 })
 
 base.controller('banner', function($scope, $http, user) {
-	user.bind(function() {
-		$scope.get();
-	})
-	$scope.get = function() {
-		$http.post(service + "wxuser/getWxImg?mid=" + user.info.mid)
-			.then(function(r) {
-				if (r.data.code == 200) {
-					$scope.list = r.data.list;
-					setTimeout(function() {
-						var $swi = $("#swipe i"),
-							$s = $("#swipe");
-						$s.find("a").slice($swi.length).remove();
-						$swi.eq(0).addClass("on");
-						$s.Swipe({
-							startSlide: 0,
-							auto: 4000,
-							transitionEnd: function(i) {
-								$swi.removeClass("on").eq(i).addClass("on");
-							}
-						})
-					}, 999)
-				}
-			});
-	};
+	$http.post(service + "wxuser/getWxImg?mid=" + user.info.mid)
+		.then(function(r) {
+			if (r.data.code == 200) {
+				$scope.list = r.data.list;
+				setTimeout(function() {
+					var $swi = $("#swipe i"),
+						$s = $("#swipe");
+					$s.find("a").slice($swi.length).remove();
+					$swi.eq(0).addClass("on");
+					$s.Swipe({
+						startSlide: 0,
+						auto: 4000,
+						transitionEnd: function(i) {
+							$swi.removeClass("on").eq(i).addClass("on");
+						}
+					})
+				}, 999)
+			}
+		});
 })
 
 base.controller('qlist', function($scope, $http, fac, user, hash, QType) {
@@ -380,6 +381,18 @@ base.controller('qlist', function($scope, $http, fac, user, hash, QType) {
 				});
 		}
 	}
+
+	$scope.getS = function(c) {
+		c.showL = !c.showL;
+		if (c.showL&&!c.sublist) {
+			$http.post(service + "exam/getSections?sid=" + c.id)
+				.then(function(r) {
+					if (r.data.code == 200) {
+						c.sublist = r.data.list;
+					}
+				});
+		}
+	}
 })
 
 base.controller('myclass', function($scope, $http, fac, user, hash) {
@@ -406,19 +419,19 @@ base.controller('myclass', function($scope, $http, fac, user, hash) {
 })
 
 base.controller('newslist', function($scope, $http, user, fac) {
-	user.bind(function() {
-		$http.post(service + "exam/getExamserviceDays?mid=" + user.info.mid)
-			.then(function(r) {
-				if (r.data.code == 200) {
-					$scope.date = r.data.list[0].days.toString().split("");
-				}
-			});
-		$http.post(service + "infomation/getHomeInfomation?cp=1&type=1&mid=" + user.info.mid)
-			.then(function(r) {
-				if (r.data.code == 200)
-					$scope.list = r.data.list;
-			});
-	})
+	user.need = false;
+	fac.share();
+	$http.post(service + "exam/getExamserviceDays?mid=" + user.info.mid)
+		.then(function(r) {
+			if (r.data.code == 200) {
+				$scope.date = r.data.list[0].days.toString().split("");
+			}
+		});
+	$http.post(service + "infomation/getHomeInfomation?cp=1&type=1&mid=" + user.info.mid)
+		.then(function(r) {
+			if (r.data.code == 200)
+				$scope.list = r.data.list;
+		});
 })
 
 base.controller('newsitem', function($scope, $http, $sce, user, fac, hash) {
@@ -621,6 +634,19 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 	$scope.html = function(s) {
 		return $sce.trustAsHtml(s);
 	}
+	$scope.getOne = function(ti,si) {
+		$scope.t = $scope.list[ti];
+		$scope.s = $scope.t.question[si];
+		if(!$scope.s.question)
+			$http.get(service + "exam/get" + $scope.rt.one + "?qid=" + $scope.s.qid)
+				.then(function(r) {
+					if (r.data.code == 200) {
+						$scope.s = $scope.list[ti].question[si] = r.data.list;
+					}
+				},function(){
+					alert("请求失败，请检查网络连接是否断开")
+				});
+	}
 	$scope.start = function(bl) {
 		$scope.showBtn = !bl;
 		$scope.started = true;
@@ -629,23 +655,23 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 	}
 	$scope.next = function() {
 		if ($scope.si + 1 < $scope.t.question.length)
-			$scope.s = $scope.t.question[++$scope.si];
+			++$scope.si;
 		else if ($scope.ti + 1 < $scope.list.length) {
-			$scope.t = $scope.list[++$scope.ti];
-			$scope.s = $scope.t.question[$scope.si = 0];
+			++$scope.ti;
+			$scope.si = 0;
 		} else if (!$scope.hideNext) {
 			$scope.viewCard();
 			$scope.submit_show = $scope.hideNext = true;
 		}
-
+		$scope.getOne($scope.ti,$scope.si);
 	}
 	$scope.prev = function() {
 		if ($scope.si)
-			$scope.s = $scope.t.question[--$scope.si];
+			--$scope.si;
 		else if ($scope.ti) {
-			$scope.t = $scope.list[--$scope.ti];
-			$scope.s = $scope.t.question[$scope.si = $scope.t.question.length - 1];
+			$scope.si = $scope.list[--$scope.ti].question.length - 1;
 		}
+		$scope.getOne($scope.ti,$scope.si);
 	}
 
 	var time_s = 0,
@@ -673,7 +699,8 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 	}
 
 	if ($scope.rt.type == "grade") {
-		$scope.rt.get = "GradeQuestion";
+		$scope.rt.get = "GradeQuestionWx";
+		$scope.rt.one = "GradeQoneWx";
 		$scope.rt.update = "gradedb";
 		$scope.showBtn = $scope.started = true;
 	} else
@@ -681,6 +708,7 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 			if ($scope.rt.type == v.type) {
 				$scope.rt.get = v.get;
 				$scope.rt.update = v.update;
+				$scope.rt.one = v.one;
 				if (i)
 					$http.get(service + "exam/get" + v.info + "ById?sid=" + $scope.rt.sid)
 					.then(function(r) {
@@ -696,8 +724,7 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 		.then(function(r) {
 			if (r.data.code == 200) {
 				$scope.list = r.data.list;
-				$scope.t = $scope.list[$scope.ti];
-				$scope.s = $scope.t.question[$scope.si];
+				$scope.getOne($scope.ti,$scope.si);
 				$scope.geted = true;
 				if ($scope.started && !$scope.showBtn)
 					$scope.timePlay();
@@ -740,13 +767,14 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 			else
 				$timeout($scope.next, 99);
 		}
-		$http.get(service + "exam/update" + $scope.rt.update + "byqid?id=" + s.qid + "&answers=" + s.checked)
+		$http.get(service + "exam/update" + $scope.rt.update + "byqid?id=" + s.id + "&answers=" + s.checked)
 	}
 
 	$scope.score = 0;
 	$scope.go = function(ti, si) {
-		$scope.t = $scope.list[$scope.ti = ti];
-		$scope.s = $scope.t.question[$scope.si = si];
+		$scope.ti = ti;
+		$scope.si = si;
+		$scope.getOne(ti, si);
 		$scope.viewCard();
 	}
 	$scope.viewCard = function() {
@@ -771,46 +799,76 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 	}
 })
 
-base.controller('shareTest', function($scope, $http, $timeout, $sce, fac, hash) {
-	$scope.rt = hash;
+base.controller('shareTest', function($scope, $http, $timeout, $sce, fac, hash, QType) {
+	$scope.rt = hash.init({
+		type: "模拟考试"
+	});
+	$scope.QType = QType;
 	$scope.ti = $scope.si = 0;
 	$scope.showBtn = true;
+	fac.share();
 
 	$scope.html = function(s) {
 		return $sce.trustAsHtml(s);
 	}
+	$scope.getOne = function(ti,si) {
+		$scope.t = $scope.list[ti];
+		$scope.s = $scope.t.question[si];
+		if(!$scope.s.question)
+			$http.get(service + "exam/get" + $scope.rt.one + "?qid=" + $scope.s.qid)
+				.then(function(r) {
+					if (r.data.code == 200) {
+						$scope.s = $scope.list[ti].question[si] = r.data.list;
+					}
+				},function(){
+					alert("请求失败，请检查网络连接是否断开")
+				});
+	}
+	$scope.start = function(bl) {
+		$scope.showBtn = !bl;
+		$scope.started = true;
+		if ($scope.geted && bl)
+			$scope.timePlay();
+	}
 	$scope.next = function() {
 		if ($scope.si + 1 < $scope.t.question.length)
-			$scope.s = $scope.t.question[++$scope.si];
+			++$scope.si;
 		else if ($scope.ti + 1 < $scope.list.length) {
-			$scope.t = $scope.list[++$scope.ti];
-			$scope.s = $scope.t.question[$scope.si = 0];
+			++$scope.ti;
+			$scope.si = 0;
 		} else
 			$scope.showAd = true;
+		$scope.getOne($scope.ti,$scope.si);
 	}
 	$scope.prev = function() {
 		if ($scope.si)
-			$scope.s = $scope.t.question[--$scope.si];
+			--$scope.si;
 		else if ($scope.ti) {
-			$scope.t = $scope.list[--$scope.ti];
-			$scope.s = $scope.t.question[$scope.si = $scope.t.question.length - 1];
+			$scope.si = $scope.list[--$scope.ti].question.length - 1;
 		}
+		$scope.getOne($scope.ti,$scope.si);
 	}
 
-	$http.get(service + "exam/getSimulOneById?sid=" + $scope.rt.sid)
-		.then(function(r) {
-			if (r.data.code == 200) {
-				$scope.info = r.data.list[0];
-				document.title = $scope.info.title;
-				fac.share($scope.info.title, $scope.info.info);
-			}
-		});
-	$http.post(service + "exam/getSimulQuestion?sid=" + $scope.rt.sid)
+	angular.forEach(QType, function(v, i) {
+		if ($scope.rt.type == v.name) {
+			$scope.rt.get = v.get;
+			$scope.rt.one = v.one;
+			$http.get(service + "exam/get" + v.info + "ById?sid=" + $scope.rt.sid)
+				.then(function(r) {
+					if (r.data.code == 200) {
+						$scope.info = r.data.list[0];
+						document.title = $scope.info.title;
+						fac.share($scope.info.title, $scope.info.info);
+					}
+				});
+		}
+	})
+	$http.post(service + "exam/get" + $scope.rt.get + "?sid=" + $scope.rt.sid)
 		.then(function(r) {
 			if (r.data.code == 200) {
 				$scope.list = r.data.list;
-				$scope.t = $scope.list[$scope.ti];
-				$scope.s = $scope.t.question[$scope.si];
+				$scope.list = r.data.list;
+				$scope.getOne($scope.ti,$scope.si);
 				$scope.geted = true;
 			}
 		});
@@ -863,6 +921,9 @@ base.controller('wrong', function($scope, $http, $sce, fac, user, hash) {
 	}, {
 		type: "2",
 		name: "模拟考试"
+	}, {
+		type: "4",
+		name: "学习计划"
 	}];
 	$scope.rt = hash.init({
 		type: $scope.nlist[0].type
@@ -901,22 +962,22 @@ base.controller('wrong', function($scope, $http, $sce, fac, user, hash) {
 	}
 
 	$scope.show = function(s) {
-		$scope.s = s.question;
+		$scope.s = s;
 		$scope.card = true;
 	}
 	$scope.delStudy = function(qid) {
-		$http.get(service + "exam/removerrStudy?qid=" + qid)
+		$http.get(service + "exam/removerrStudy?type=" + $scope.rt.type + "&qid=" + qid)
 			.then(function() {
 				$scope.get($scope.page.index, true);
 			});
 	}
 	$scope.addStar = function(s) {
 		s.colled = true;
-		$http.get(service + "exam/addStudy?qid=" + s.id + (s.checked ? "&answers=" + s.checked : ""));
+		$http.get(service + "exam/addStudy?qid=" + s.qid + (s.checked ? "&answers=" + s.checked : ""));
 	}
 	$scope.delStar = function(s) {
 		s.colled = false;
-		$http.get(service + "exam/removeStudy?qid=" + s.id);
+		$http.get(service + "exam/removeStudy?qid=" + s.qid);
 	}
 })
 
@@ -964,7 +1025,8 @@ base.controller('fav', function($scope, $http, $sce, fac, user, hash) {
 
 base.controller('item', function($scope, $http, $timeout, $sce, fac, user, hash) {
 	$scope.user = user;
-	$scope.random = Math.floor(Math.random() * 9) % 3 + 1
+	$scope.random = Math.floor(Math.random() * 9) % 3 + 1;
+	$scope.loading = true;
 	$scope.rt = hash.init({
 		type: 1
 	});
@@ -1003,6 +1065,7 @@ base.controller('item', function($scope, $http, $timeout, $sce, fac, user, hash)
 	}
 	$http.post(service + "gradeFront/getVideoBygid?gid=" + $scope.rt.gid)
 		.then(function(r) {
+			$scope.loading = false;
 			if (r.data.code == 200) {
 				$scope.info = r.data.list;
 				$scope.info.index = 0;
@@ -1042,9 +1105,9 @@ base.controller('item', function($scope, $http, $timeout, $sce, fac, user, hash)
 						document.body.scrollTop = 0;
 						if (adde) {
 							var $video = document.getElementById('vo');
-							$video.addEventListener("error", function(err) {
-								alert(JSON.stringify(err) + $video.error.code + "-" + $video.error.message);
-							});
+							// $video.addEventListener("error", function(err) {
+							// 	alert(JSON.stringify(err) + $video.error.code + "-" + $video.error.message);
+							// });
 							$video.addEventListener("timeupdate", function() {
 								n++;
 								if (n % 99 == 0) {
@@ -1198,10 +1261,17 @@ base.controller('issues', function($scope, $http, $timeout, user, fac) {
 })
 
 base.controller('bind', function($scope, $http, $interval, $timeout, hash, fac) {
+	$scope.r = 0;
+	$scope.ran = function(){
+		$scope.r++;
+	}
+
 	$scope.send = function(ph) {
 		if ($scope.user.phone.$valid && !$scope.sended) {
-			$http.get(service + "wxuser/getCode?ph=" + ph)
+			$scope.errMsg = "";
+			$http.get(service + "wxuser/getCode?ph=" + ph + "&vcode=" + $scope.imgcode)
 				.then(function(r) {
+					$scope.r++;
 					if (r.data.code == 200) {
 						$scope.s = 60;
 						$scope.sended = true;
@@ -1283,44 +1353,45 @@ base.controller('center', function($scope, user) {
 })
 
 base.controller('home', function($scope, $http, user, fac) {
-	$scope.user = user;
-
-	user.bind(function() {
-		$http.post(service + "frontIndex/getAllFrontTeacher?page=1&rows=20&mid=" + user.info.mid)
-			.then(function(r) {
-				if (r.data.code == 200) {
-					$scope.ht_list = r.data.list;
-					setTimeout(function() {
-						$("#swipe_h1").Swipe({
-							startSlide: 0,
-							auto: 4000
-						})
-					}, 999)
-				}
-			});
-		$http.post(service + "infomation/getHomeInfomation?cp=1&type=2&mid=" + user.info.mid)
-			.then(function(r) {
-				if (r.data.code == 200)
-					$scope.news = r.data.list[0];
-			});
-		$http.post(service + "gradeFront/getGradeByCid?page=1&rows=20&mid=" + user.info.mid)
-			.then(function(r) {
-				if (r.data.code == 200)
-					$scope.list = r.data.list;
-			});
-		$http.post(service + "gradeFront/getSmallgrade?mid=" + user.info.mid)
-			.then(function(r) {
-				if (r.data.code == 200)
-					$scope.clist = r.data.list;
-			});
-	})
+	user.need = false;
+	fac.share();
+	$http.post(service + "frontIndex/getAllFrontTeacher?page=1&rows=20&mid=" + user.info.mid)
+		.then(function(r) {
+			if (r.data.code == 200) {
+				$scope.ht_list = r.data.list;
+				setTimeout(function() {
+					$("#swipe_h1").Swipe({
+						startSlide: 0,
+						auto: 4000
+					})
+				}, 999)
+			}
+		});
+	$http.post(service + "infomation/getHomeInfomation?cp=1&type=2&mid=" + user.info.mid)
+		.then(function(r) {
+			if (r.data.code == 200)
+				$scope.news = r.data.list[0];
+		});
+	$http.post(service + "gradeFront/getGradeByCid?page=1&rows=20&mid=" + user.info.mid)
+		.then(function(r) {
+			if (r.data.code == 200)
+				$scope.list = r.data.list;
+		});
+	$http.post(service + "gradeFront/getSmallgrade?mid=" + user.info.mid)
+		.then(function(r) {
+			if (r.data.code == 200)
+				$scope.clist = r.data.list;
+		});
 	$scope.pay = function(s) {
 		$http.post(service + "wxuser/addBalance?gids=" + s)
 			.then(function(r) {
 				if (r.data.code == 200)
 					user.pay(r.data);
-				else
+				else{
 					alert(r.data.msg);
+					if(r.data.code == -2)
+						location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx727973ddd3d1c2fb&redirect_uri=http%3A%2F%2Fwx.zkjan.com%2Fkstk-api%2Fwxuser%2FgetToken?&response_type=code&scope=snsapi_userinfo&state=h_' + encodeURIComponent(location.href) + '#wechat_redirect'
+				}
 			});
 	}
 })

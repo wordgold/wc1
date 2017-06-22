@@ -314,7 +314,7 @@ nav{
 }
 nav a{
 	display: inline-block;
-	padding: 0 1em;
+	padding: 0 .4em;
 	height: 40px;
 	line-height: 40px;
 	border-bottom: 2px #fff solid;

@@ -7,9 +7,10 @@
 <body ng-app="baseApp" class="hidef">
 <!--#include virtual="/include/header.html"-->
 <div ng-controller="item" class="ng-init">
-	<div class="no_class" ng-if="!vlist.length">
+	<div class="loading" ng-if="loading"></div>
+	<div class="no_class" ng-show="!vlist.length&&!loading">
 		课程即将开始，请耐心等待……
-		<a href="<!--#echo var="wc1"-->class/list.html" class="b_btn bg_red">查看其他班次</a>
+		<a href="<!--#echo var="wc1"-->study/index.html" class="b_btn bg_red">查看其他班次</a>
 	</div>
 	<div ng-if="vlist.length" style="padding-top: 250px;">
 		<div class="video" style="background-image:url({{info.imgurl}})">
@@ -34,7 +35,7 @@
 				</div>
 				<ol ng-if="g.flist.length">
 					<hr>
-					<li class="li" ng-repeat="v in g.flist" ng-click="getVideo(v)">
+					<li class="li" ng-repeat="v in g.flist" ng-if="v.name.indexOf('仅课件')" ng-click="getVideo(v)">
 						<i class="i_circle"></i>{{v.name | slice:20}}
 						<i class="i_pause red fr" style="margin: 6px 4% 0 0" ng-if="v.id==rt.vid"></i>
 						<i class="i_play fr" style="margin: 6px 4% 0 0" ng-if="(!v.is_free||info.buy)&&v.id!=rt.vid"></i>
