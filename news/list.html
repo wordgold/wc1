@@ -5,13 +5,11 @@
 	<title>最新资讯</title>
 </head>
 <body ng-app="baseApp">
-<!--#include virtual="/include/banner.html"-->
 <div ng-controller="newslist" class="ng-init">
 	<header class="ng-init">
-		<h1>距离考试还有 <span class="newsdate" ng-repeat="i in date">{{i}}</span> 天</h1>
+		<h1>距离考试还有 <span class="newsdate" ng-repeat="i in date track by $index">{{i}}</span> 天</h1>
 	</header>
-	<div class="dlist panel">
-		<h4 class="h4_b" style="margin: 9px 4%">最新资讯</h4>
+	<div class="dlist panel" ng-if="list.length">
 		<a class="li" ng-repeat="s in list" ng-if="!s.glist" ng-href="<!--#echo var="wc1"-->news/item.html?id={{s.id}}">
 			<img ng-src="{{s.pic_url}}">
 			{{s.title|slice:14}} <br>
@@ -19,7 +17,8 @@
 			<span class="gray fr" style="margin-top: 8px;">{{s.thisdate}}</span>
 		</a>
 	</div>
-	<div class="none gray" ng-show="!list.length">
+	<label class="b_btn more" ng-click="get()" ng-if="list.length&&next">加载更多</label>
+	<div class="none gray" ng-if="!list.length">
 		很抱歉，暂无相关内容
 	</div>
 </div>
