@@ -1018,12 +1018,12 @@ base.controller('fav', function($scope, $http, $sce, fac, user, hash) {
 	}
 
 	$scope.show = function(s) {
-		$scope.s = s.question;
+		$scope.s = s;
 		$scope.card = true;
 	}
 	$scope.delStar = function(s) {
 		s.colled = false;
-		$http.get(service + "exam/removeStudy?qid=" + s.id)
+		$http.get(service + "exam/removeStudy?qid=" + s.qid)
 			.then(function() {
 				$scope.get($scope.page.index, true);
 			});
