@@ -483,9 +483,10 @@ base.controller('history', function($scope, $http, fac, user, hash) {
 	$scope.show = function(q,gid) {
 		q.showList = !q.showList;
 		if(q.showList && !q.list){
-			$http.post(service + "webuser/getMy" + (hash.type ? "GradeExamOrder" : "PlanGradeOrder") + "?gid=" + gid + "&order_id=" + q.order_id).success(function(response) {
-				if (response.code == 200) {
-					q.list = response.list;
+			$http.post(service + "webuser/getMy" + (hash.type == 2 ? "GradeExamOrder" : "PlanGradeOrder") + "?gid=" + gid + "&order_id=" + q.order_id)
+			.then(function(r) {
+				if (r.data.code == 200) {
+					q.list = r.data.list;
 				}
 			});
 		}
