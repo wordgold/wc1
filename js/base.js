@@ -479,10 +479,22 @@ base.controller('history', function($scope, $http, fac, user, hash) {
 			$scope.get();
 		}
 	};
+
+	$scope.show = function(q,gid) {
+		q.showList = !q.showList;
+		if(q.showList && !q.list){
+			$http.post(service + "webuser/getMy" + (hash.type ? "GradeExamOrder" : "PlanGradeOrder") + "?gid=" + gid + "&order_id=" + q.order_id).success(function(response) {
+				if (response.code == 200) {
+					q.list = response.list;
+				}
+			});
+		}
+	}
+
 	$scope.get = function(i, b) {
 		$scope.list = [];
 		$scope.loading = true;
-		$http.post(service + "webuser/" + (hash.type == 2 ? "getMyGradeExam" : "getMyPlanGrade") + "?rows=99&mid=" + user.info.mid + "&cid=" + user.info.cid)
+		$http.post(service + "webuser/getMy" + (hash.type == 2 ? "GradeExam" : "PlanGrade") + "?rows=99&mid=" + user.info.mid + "&cid=" + user.info.cid)
 			.then(function(r) {
 				$scope.loading = false;
 				if (r.data.code == 200) {
