@@ -89,7 +89,7 @@ base.service("user", function($http) {
 				else
 					s.fire();
 			} else if (s.need)
-				location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx727973ddd3d1c2fb&redirect_uri=http%3A%2F%2Fwx.zkjan.com%2Fkstk-api%2Fwxuser%2FgetToken?&response_type=code&scope=snsapi_userinfo&state=h_' + encodeURIComponent(location.pathname + location.search) + '#wechat_redirect'
+				location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx727973ddd3d1c2fb&redirect_uri=http%3A%2F%2Fwx.zkjan.com%2Fkstk-api%2Fwxuser%2FgetToken?&response_type=code&scope=snsapi_userinfo&state=hxh' + encodeURIComponent(location.pathname + location.search) + '#wechat_redirect'
 		});
 	s.selectC = function() {
 		s.sc = true;
