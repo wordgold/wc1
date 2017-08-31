@@ -50,7 +50,7 @@
 			<div id="swipe_h1" class="swipe_b">
 				<div class="swipe">
 					<div class="l_teacher fl" ng-repeat="s in ht_list">
-						<div class="img" style="height:200px;background-image:url({{s.logo}})"></div>
+						<img ng-src="{{s.logo}}">
 						<h5><span>{{s.name}}</span></h5>
 						{{s.info | slice:36}}<br>主讲课程：{{s.course | slice:32}}
 					</div>

@@ -1121,6 +1121,12 @@ header .i_menu{
 	margin: 9px 0;
 	font-size: 14px;
 }
+.l_teacher img{
+	width: 260px;
+	height: 220px;
+	display: block;
+	margin: 0 auto;
+}
 .l_teacher h5{
 	border-top: 1px #22a7f3 solid;
 	height: 2px;

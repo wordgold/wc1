@@ -16,7 +16,7 @@
 				{{c.chapter_name}} <br>
 				<span class="gray">答题进度：<i class="i_bar"><u ng-class="{'a':c.p>0.84,'b':c.p>0.69,'c':c.p>0.49}" ng-style="{width:c.yznums/c.nums*100+'%'}"></u></i>{{c.yznums||0}}/{{c.nums}}</span>
 				<span class="gray" ng-if="c.yznums">正确率：{{c.p}}%</span>
-				<a ng-if="user.info.mid==11" ng-href="<!--#echo var="wc1"-->study/test.html?mid={{c.major_id}}&cid={{c.id}}&type={{rt.type}}&name={{c.chapter_name}}" class="btn">做题</a>
+				<a ng-if="user.info.mid==11" ng-href="<!--#echo var="wc1"-->study/test.html?cid={{c.id}}&type={{rt.type}}&name={{c.chapter_name}}" class="btn">做题</a>
 			</div>
 			<ol ng-if="c.sublist.length">
 				<hr>
@@ -25,7 +25,7 @@
 					{{s.section_name | slice : 18}}
 					<p ng-if="s.nums"><span class="gray">答题进度：<i class="i_bar"><u ng-class="{'a':s.p>0.84,'b':s.p>0.69,'c':s.p>0.49}" ng-style="{width:s.yznums/s.nums*100+'%'}"></u></i>{{s.yznums||0}}/{{s.nums}}</span>
 					<span class="gray" ng-if="s.yznums">正确率：{{c.p}}</span>
-					<a ng-href="<!--#echo var="wc1"-->study/test.html?mid={{c.major_id}}&cid={{c.id}}&type={{rt.type}}&sid={{s.id}}&name={{s.chapter_name}}-{{s.section_name}}" class="btn">做题</a>
+					<a ng-href="<!--#echo var="wc1"-->study/test.html?type={{rt.type}}&sid={{s.id}}&name={{s.chapter_name}}-{{s.section_name}}" class="btn">做题</a>
 					</p>
 				</li>
 			</ol>
@@ -33,7 +33,7 @@
 	</ul>
 	<ul class="qlist panel" ng-if="(rt.type==nlist[1].type||rt.type==nlist[2].type)&&list.length">
 		<li class="li" ng-repeat="s in list">
-			<a class="btn" ng-href="<!--#echo var="wc1"-->study/test.html?mid={{user.info.mid}}&cid={{user.info.cid}}&type={{rt.type}}&sid={{s.id}}&name={{s.title}}">做题</a>
+			<a class="btn" ng-href="<!--#echo var="wc1"-->study/test.html?type={{rt.type}}&sid={{s.id}}&name={{s.title}}">做题</a>
 			{{s.title | slice : 20}} <br>
 			<span class="gray">题量：{{s.nums}}</span>
 			<span class="gray">时长：{{s.times}} 分钟</span>

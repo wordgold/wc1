@@ -813,9 +813,9 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 	}
 	$scope.changeFav = function(s) {
 		if (s.colled = !s.colled)
-			$http.get(service + "exam/addStudy?qid=" + s.qid + (s.checked ? "&answers=" + s.checked : ""));
+			$http.get(service + "exam/addStudy?qid=" + s.id + (s.checked ? "&answers=" + s.checked : ""));
 		else
-			$http.get(service + "exam/removeStudy?qid=" + s.qid);
+			$http.get(service + "exam/removeStudy?qid=" + s.id);
 	}
 })
 

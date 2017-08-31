@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+<title>在线免费做题-中科建安教育</title>
+</head>
+<body ng-app="baseApp" class="hidef">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="testDay" class="ng-init">
+	<div ng-if="!started">
+		<h2 class="panel">{{rt.name}}</h2>
+		<div class="r_panel test_info">
+			<span>试卷类型：{{info.types}}</span>
+			<span>试卷题量：{{info.total}}</span>
+			<span>考试时长：{{info.times}} 分钟</span>
+			<span>及格/总分：{{info.qualified_point}}/{{info.all_point}}</span>
+		</div>
+		<div class="btns">
+			<label class="b_btn blue" ng-click="start(false)">练习模式</label>
+			<label class="b_btn red" ng-click="start(true)">计时开始</label>
+		</div>
+		<div class="r_panel">
+			<h3 class="h3"><i class="i_book"></i>试卷详情</h3>
+			<div class="test_t" ng-if="!started" ng-bind-html="html(info.info)"></div>
+		</div>
+	</div>
+	<div ng-show="started" style="padding: 0 0 64px 0">
+		<div class="loading" ng-if="!geted"></div>
+		<div class="panel" ng-show="geted">
+			<h3 class="h3">{{ti | xyz}}. {{t.question_type_name}} <span class="fr gray">{{si+1}}/{{t.question.length}}</span></h3>
+			<div ng-bind-html="html(si+1+'. '+s.question)" class="q_header"></div>
+			<img ng-src="{{s.question_url}}" ng-if="s.question_url" style="display: block;max-width: 100%;margin: 9px auto">
+			<label class="answer" ng-repeat="a in s.options" ng-click="goVote(s,a.id)" ng-class="{'on':vote(s.checked,a.id,s.question_type_id),'submited':submited,'real':a.is_real}">
+				<span>{{$index | abcd}}</span>
+				<p>{{a.answer}} <img ng-if="a.answer_url" ng-src="{{a.answer_url}}"></p>
+			</label>
+			<div class="test_nav">
+				<label ng-click="prev()"><i ng-show="ti||si" class="i_left"></i></label>
+				<label ng-if="rt.type==QType[0].type" ng-click="changeFav(s)"><i ng-if="!s.colled" class="i_fav"></i><i ng-if="s.colled" class="i_fav_h"></i> 收藏</label>
+				<label ng-if="showBtn&&!submited" ng-click="s.showA=!s.showA"><i class="i_light"></i> 解析</label>
+				<label ng-if="!showBtn" ng-click="changeTime()" class="fr"><i ng-if="time_stoped&&!submited" class="i_play"></i><i ng-if="!time_stoped&&!submited" class="i_pause"></i> {{time}}</label>
+				<label ng-click="viewCard()"><i class="i_apps"></i> 答题卡</label>
+				<label ng-click="next()"><i ng-hide="hideNext" class="i_right"></i></label>
+			</div>
+		</div>
+		<div ng-if="s.showA||submited" class="q_footer panel">
+			<h3 class="h3" ng-if="t.question_type_id<3">
+				参考答案：
+				<span class="green" ng-repeat="a in s.options" ng-if="a.is_real">{{$index | abcd}}</span>
+				<span class="gray fr">统计全平台正确率为 {{pen(s.answer_right,s.answer_num)}}</span>
+			</h3>
+			<div class="q_footer_a" ng-if="s.analysis.analysis" ng-bind-html="html('<span>参考解析：</span>'+s.analysis.analysis)">
+			</div>
+		</div>
+		<div ng-show="time_stoped" class="alert">
+			<div class="r_panel" ng-show="!card_show&&!time_end">
+				<h4>答题暂停中</h4>
+				<label class="b_btn bg_blue" ng-click="timePlay()"><i class="icon i_play"></i> 继续答题</label>
+			</div>
+			<div class="r_panel" ng-show="card_show&&!submit_show">
+				<div class="card max_h">
+					<div ng-repeat="t in list">
+						<h3 class="h3" ng-click="scroll('ttp'+t.question_type_id)">{{$index | xyz}}. {{t.question_type_name}}</h3>
+						<label ng-repeat="s in t.question" class="{{s.yesno}}" ng-class="{'on':s.checked,'submited':submited}" ng-click="go($parent.$index,$index)">{{$index+1}}</label>
+					</div>
+				</div>
+				<span class="i_score" ng-if="submited">{{score}}</span>
+				<div class="btns"><label class="b_btn" ng-click="viewCard()">关闭答题卡</label><label ng-if="!submited" class="b_btn bg_red" ng-click="$parent.submit_show=true"><i class="icon i_done_all"></i> 提交试卷</label></div>
+			</div>
+			<div class="r_panel" ng-show="submit_show">
+				<h4>确认提交试卷？</h4>
+				<div class="btns" ng-click="submit_show=false"><label class="b_btn"><i class="icon i_left"></i> 返回答题卡</label><label class="b_btn bg_red" ng-click="submit()"><i class="icon i_done_all"></i> 确认提交</label></div>
+			</div>
+			<div class="r_panel" ng-show="time_end">
+				<h4>考试时间已到<br>请点击下方按钮</h4>
+				<label class="b_btn bg_red" ng-click="time_end=false||submit()"><i class="icon i_done_all"></i> 提交试卷</label>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<!--#include virtual="/include/footer.html"-->
+<script>
+base.controller('testDay', function($scope, $http, $interval, $timeout, $sce, fac, user, hash, QType) {
+	$scope.rt = hash;
+	$scope.ti = $scope.si = 0;
+	$scope.QType = QType;
+	user.title = $scope.rt.name;
+	user.title = "每日习题";
+	fac.share("在线做题-" + user.title);
+
+	$scope.html = function(s) {
+		return $sce.trustAsHtml(s);
+	}
+	$scope.getOne = function(ti, si) {
+		$scope.t = $scope.list[ti];
+		$scope.s = $scope.t.question[si];
+		if (!$scope.s.question)
+			$http.get(service + "exam/get" + $scope.rt.one + "?qid=" + $scope.s.qid)
+			.then(function(r) {
+				if (r.data.code == 200) {
+					$scope.s = $scope.list[ti].question[si] = r.data.list;
+				}
+			}, function() {
+				alert("请求失败，请检查网络连接是否断开")
+			});
+	}
+	$scope.start = function(bl) {
+		$scope.showBtn = !bl;
+		$scope.started = true;
+		if ($scope.geted && bl)
+			$scope.timePlay();
+	}
+	$scope.next = function() {
+		if ($scope.si + 1 < $scope.t.question.length)
+			++$scope.si;
+		else if ($scope.ti + 1 < $scope.list.length) {
+			++$scope.ti;
+			$scope.si = 0;
+		} else if (!$scope.hideNext) {
+			$scope.viewCard();
+			$scope.submit_show = $scope.hideNext = true;
+		}
+		$scope.getOne($scope.ti, $scope.si);
+	}
+	$scope.prev = function() {
+		if ($scope.si)
+			--$scope.si;
+		else if ($scope.ti) {
+			$scope.si = $scope.list[--$scope.ti].question.length - 1;
+		}
+		$scope.getOne($scope.ti, $scope.si);
+	}
+
+	var time_s = 0,
+		time_m = 0;
+	$scope.time = "0:00";
+	$scope.timePlay = function() {
+		$scope.time_stoped = false;
+		$scope.time_t = $interval(function() {
+			if (time_s == 59) {
+				time_m++;
+				time_s = 0;
+			} else
+				time_s++;
+			$scope.time = time_m + ":" + (time_s < 10 ? "0" + time_s : time_s);
+			if (time_m == $scope.info.times)
+				$scope.time_end = $scope.timeStop() || true;
+		}, 1000);
+	}
+	$scope.timeStop = function() {
+		$scope.time_stoped = true;
+		$interval.cancel($scope.time_t);
+	}
+	$scope.changeTime = function() {
+		$scope.time_stoped ? $scope.timePlay() : $scope.timeStop();
+	}
+
+	if ($scope.rt.type == "grade") {
+		$scope.rt.get = "GradeQuestionWx";
+		$scope.rt.one = "GradeQoneWx";
+		$scope.rt.update = "gradedb";
+		$scope.showBtn = $scope.started = true;
+	} else
+		angular.forEach(QType, function(v, i) {
+			if ($scope.rt.type == v.type) {
+				$scope.rt.get = v.get;
+				$scope.rt.update = v.update;
+				$scope.rt.one = v.one;
+				if (i)
+					$http.get(service + "exam/get" + v.info + "ById?sid=" + $scope.rt.sid)
+					.then(function(r) {
+						if (r.data.code == 200) {
+							$scope.info = r.data.list[0];
+						}
+					});
+				else
+					$scope.showBtn = $scope.started = true;
+			}
+		})
+
+	user.bind(function() {
+		$http.post(service + "exam/get" + $scope.rt.get + "?" + ($scope.rt.sid ? "sid=" + $scope.rt.sid : "cid=" + $scope.rt.cid))
+			.then(function(r) {
+				if (r.data.code == 200) {
+					$scope.list = r.data.list;
+					$scope.getOne($scope.ti, $scope.si);
+					$scope.geted = true;
+					if ($scope.started && !$scope.showBtn)
+						$scope.timePlay();
+				}else
+					location.href = '<!--#echo var="wc1"-->study/index.html';
+			});
+	})
+
+	var split = function(s, str) {
+			var a = str.split("-"),
+				b = new Array(),
+				c = true;
+			for (var i = a.length; i--;) {
+				if (s == a[i])
+					c = false;
+				else
+					b.push(a[i]);
+			}
+			if (c)
+				b.push(s)
+			return b.sort().join("-")
+		},
+		getResult = function(s) {
+			if (!s.result) {
+				s.result = new Array();
+				for (var i = s.options.length; i--;) {
+					if (s.options[i].is_real)
+						s.result.push(s.options[i].id);
+				}
+				s.result = s.result.sort().join("-");
+			}
+			return s.yesno = s.result == s.checked ? "yes" : "no";
+		}
+	$scope.vote = fac.vote;
+	$scope.pen = fac.pen;
+	$scope.goVote = function(s, aid) {
+		s.checked = (s.question_type_id == 1 || !s.checked) ? "" + aid : split(aid, s.checked);
+		getResult(s);
+		if (s.question_type_id == 1) {
+			if ($scope.time == "0:00")
+				s.showA = true;
+			else
+				$timeout($scope.next, 99);
+		}
+		$http.get(service + "exam/update" + $scope.rt.update + "byqid?id=" + s.id + "&answers=" + s.checked)
+	}
+
+	$scope.score = 0;
+	$scope.go = function(ti, si) {
+		$scope.ti = ti;
+		$scope.si = si;
+		$scope.getOne(ti, si);
+		$scope.viewCard();
+	}
+	$scope.viewCard = function() {
+		($scope.submited || $scope.showBtn) ? ($scope.time_stoped = !$scope.time_stoped) : $scope.changeTime();
+		$scope.card_show = !$scope.card_show;
+	}
+	$scope.submit = function() {
+		for (var i = $scope.list.length; i--;) {
+			for (var q = $scope.list[i].question.length; q--;) {
+				if ($scope.list[i].question[q].yesno == "yes")
+					$scope.score++;
+			}
+		}
+		$scope.submited = $scope.card_show = true;
+		$scope.changeTime = function() {};
+	}
+	$scope.changeFav = function(s) {
+		if (s.colled = !s.colled)
+			$http.get(service + "exam/addStudy?qid=" + s.id + (s.checked ? "&answers=" + s.checked : ""));
+		else
+			$http.get(service + "exam/removeStudy?qid=" + s.id);
+	}
+})
+</script>
+</body>
+</html>
