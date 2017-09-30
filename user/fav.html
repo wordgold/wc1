@@ -7,6 +7,7 @@
 <body ng-app="baseApp">
 <!--#include virtual="/include/header.html"-->
 <div ng-controller="fav" class="ng-init">
+	<!--#include virtual="/include/nav.html"-->
 	<ul class="qtnlist panel" ng-if="list.length">
 		<li class="li" ng-repeat="s in list">
 			<label class="t" ng-click="show(s)" ng-bind-html="html(s.question)"></label>

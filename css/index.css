@@ -585,9 +585,10 @@ header .i_menu{
 }
 .banner i{
 	display: inline-block;
-	width: 24px;
-	height: 4px;
+	width: 6px;
+	height: 6px;
 	background: #fff;
+	border-radius: 50%;
 	margin: 0 4px;
 	box-shadow: 0 2px 4px rgba(0,0,0,.4)
 }
@@ -1101,18 +1102,22 @@ header .i_menu{
 /*home s*/
 .home_nav{
 	text-align: center;
-	padding: 9px 0;
+	height: 224px;
 }
 .home_nav a{
-	display: inline-block;
-	width: 24%;
+	display: block;
+	float: left;
+	width: 28%;
+	height: 99px;
+	background: #fdc7be;
 	color: #333;
 	font-size: 14px;
+	margin: 9px 0 0 4%;
 }
 .home_nav img{
 	display: block;
-	width: 50px;
-	margin: 4px auto;
+	width: 46px;
+	margin: 20px auto 0 auto;
 }
 .home_p .panel{
 	padding: 1px 4%;

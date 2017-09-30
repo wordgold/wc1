@@ -36,7 +36,7 @@
 			</label>
 			<div class="test_nav">
 				<label ng-click="prev()"><i ng-show="ti||si" class="i_left"></i></label>
-				<label ng-if="rt.type==QType[0].type" ng-click="changeFav(s)"><i ng-if="!s.colled" class="i_fav"></i><i ng-if="s.colled" class="i_fav_h"></i> 收藏</label>
+				<label ng-if="rt.type==QType[0].type||rt.type=='grade'" ng-click="changeFav(s)"><i ng-if="!s.colled" class="i_fav"></i><i ng-if="s.colled" class="i_fav_h"></i> 收藏</label>
 				<label ng-if="showBtn&&!submited" ng-click="s.showA=!s.showA"><i class="i_light"></i> 解析</label>
 				<label ng-if="!showBtn" ng-click="changeTime()" class="fr"><i ng-if="time_stoped&&!submited" class="i_play"></i><i ng-if="!time_stoped&&!submited" class="i_pause"></i> {{time}}</label>
 				<label ng-click="viewCard()"><i class="i_apps"></i> 答题卡</label>

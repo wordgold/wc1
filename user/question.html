@@ -13,7 +13,7 @@
 			<label class="t" ng-click="show(s)" ng-bind-html="html(s.question)"></label>
 			<label ng-click="delStudy(s.qid)"><i class="i_trash"></i></label>
 			<label ng-show="s.colled" ng-click="delStar(s)"><i class="i_fav_h"></i></label>
-			<label ng-show="rt.type==1&&!s.colled" ng-click="addStar(s)"><i class="i_fav"></i></label>
+			<label ng-show="(rt.type==1||rt.type==4)&&!s.colled" ng-click="addStar(s)"><i class="i_fav"></i></label>
 		</li>
 	</ul>
 	<!--#include virtual="/include/pagination.html"-->
@@ -42,7 +42,7 @@
 				<label class="b_btn" ng-click="card=false">关 闭</label>
 				<label class="b_btn bg_red" ng-click="card=false||delStudy(s.qid)"><i class="i_trash"></i> 删除</label>
 				<label class="b_btn bg_blue" ng-if="s.colled" ng-click="delStar(s)"><i class="i_fav_h"></i> 取消</label>
-				<label class="b_btn bg_blue" ng-if="rt.type==1&&!s.colled" ng-click="addStar(s)"><i class="i_fav"></i> 收藏</label>
+				<label class="b_btn bg_blue" ng-if="(rt.type==1||rt.type==4)&&!s.colled" ng-click="addStar(s)"><i class="i_fav"></i> 收藏</label>
 			</div>
 		</div>
 	</div>

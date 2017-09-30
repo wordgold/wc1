@@ -3,6 +3,7 @@ var service = "http://wx.zkjan.com/kstk-api/";
 // service = "http://192.168.3.15/kstk-api/";
 var base = angular.module('baseApp', []);
 base.config(function($httpProvider) {
+	$httpProvider.interceptors.push('httpError');
 	$httpProvider.defaults.headers.post["Content-Type"] = 'application/x-www-form-urlencoded;charset=UTF-8';
 });
 base.value('QType', [{
@@ -130,7 +131,6 @@ base.service("user", function($http) {
 					s.info.carcount = r.data.count;
 					s.info.added = true;
 				}
-				alert(r.data.msg);
 			})
 	}
 	s.pay = function(data) {
@@ -273,6 +273,34 @@ base.factory("fac", function($http) {
 						});
 					}
 				});
+		}
+	};
+}).factory("httpError", function($q) {
+	return {
+		response: function(r) {
+			// if (r.data.code && r.data.code != 200 && r.data.msg!="用户未绑定账号" && r.data.msg!="用户未登录" && r.data.msg!="请登录") {
+			// 	alert(r.data.msg || "服务器错误");
+			// }
+			return r;
+		},
+		responseError: function(r) {
+			switch (r.status) {
+				case -1:
+					//alert('连接失败');
+					break;
+				case 500:
+					alert('内部错误');
+					break;
+				case 404:
+					alert('页面不存在');
+					break;
+				case 403:
+					alert('没有权限');
+					break;
+				default:
+					alert('未知错误');
+			}
+			return $q.reject(r);
 		}
 	};
 })
@@ -432,7 +460,7 @@ base.controller('newslist', function($scope, $http, user, fac) {
 				if (r.data.code == 200) {
 					$scope.list = $scope.list.concat(r.data.list);
 					$scope.page++;
-					if($scope.list.length == r.data.total)
+					if ($scope.list.length == r.data.total)
 						$scope.next = false;
 				}
 			});
@@ -451,7 +479,7 @@ base.controller('newsitem', function($scope, $http, $sce, user, fac, hash) {
 	$http.post(service + "infomation/getInfomationContent?zid=" + $scope.rt.id)
 		.then(function(r) {
 			if (r.data.code == 200) {
-				$scope.info = r.data.list[0];
+				$scope.info = r.data.list;
 				fac.share($scope.info.title);
 			}
 		});
@@ -480,15 +508,15 @@ base.controller('history', function($scope, $http, fac, user, hash) {
 		}
 	};
 
-	$scope.show = function(q,gid) {
+	$scope.show = function(q, gid) {
 		q.showList = !q.showList;
-		if(q.showList && !q.list){
+		if (q.showList && !q.list) {
 			$http.post(service + "webuser/getMy" + (hash.type == 2 ? "GradeExamOrder" : "PlanGradeOrder") + "?gid=" + gid + "&order_id=" + q.order_id)
-			.then(function(r) {
-				if (r.data.code == 200) {
-					q.list = r.data.list;
-				}
-			});
+				.then(function(r) {
+					if (r.data.code == 200) {
+						q.list = r.data.list;
+					}
+				});
 		}
 	}
 
@@ -556,7 +584,6 @@ base.controller('order', function($scope, $http, fac, user, hash) {
 					user.pay(r.data);
 				} else {
 					$scope.paying = "";
-					alert(r.data.msg);
 				}
 			});
 	}
@@ -620,7 +647,6 @@ base.controller('car', function($scope, $http, fac, user) {
 						user.pay(r.data);
 					} else {
 						$scope.paying = "";
-						alert(r.data.msg);
 					}
 				});
 		}
@@ -660,11 +686,8 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 		if (!$scope.s.question)
 			$http.get(service + "exam/get" + $scope.rt.one + "?qid=" + $scope.s.qid)
 			.then(function(r) {
-				if (r.data.code == 200) {
+				if (r.data.code == 200)
 					$scope.s = $scope.list[ti].question[si] = r.data.list;
-				}
-			}, function() {
-				alert("请求失败，请检查网络连接是否断开")
 			});
 	}
 	$scope.start = function(bl) {
@@ -718,7 +741,9 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 		$scope.time_stoped ? $scope.timePlay() : $scope.timeStop();
 	}
 
+	var starType = "1";
 	if ($scope.rt.type == "grade") {
+		starType = "4";
 		$scope.rt.get = "GradeQuestionWx";
 		$scope.rt.one = "GradeQoneWx";
 		$scope.rt.update = "gradedb";
@@ -813,9 +838,13 @@ base.controller('test', function($scope, $http, $interval, $timeout, $sce, fac, 
 	}
 	$scope.changeFav = function(s) {
 		if (s.colled = !s.colled)
-			$http.get(service + "exam/addStudy?qid=" + s.id + (s.checked ? "&answers=" + s.checked : ""));
+			$http.get(service + "exam/addStudy?type=" + starType + "&qid=" + s.id + (s.checked ? "&answers=" + s.checked : "")).then(function(r) {
+				if (r.data.code == 200) {
+					s.clcid = r.data.list[0].clcid;
+				}
+			});
 		else
-			$http.get(service + "exam/removeStudy?qid=" + s.id);
+			$http.get(service + "exam/removeStudy?clcid=" + s.clcid);
 	}
 })
 
@@ -840,8 +869,6 @@ base.controller('shareTest', function($scope, $http, $timeout, $sce, fac, hash, 
 				if (r.data.code == 200) {
 					$scope.s = $scope.list[ti].question[si] = r.data.list;
 				}
-			}, function() {
-				alert("请求失败，请检查网络连接是否断开")
 			});
 	}
 	$scope.start = function(bl) {
@@ -993,11 +1020,15 @@ base.controller('wrong', function($scope, $http, $sce, fac, user, hash) {
 	}
 	$scope.addStar = function(s) {
 		s.colled = true;
-		$http.get(service + "exam/addStudy?qid=" + s.qid + (s.checked ? "&answers=" + s.checked : ""));
+		$http.get(service + "exam/addStudy?qid=" + s.qid + (s.checked ? "&answers=" + s.checked : "") + typeStr).then(function(r) {
+			if (r.data.code == 200) {
+				s.clcid = r.data.list[0].clcid;
+			}
+		});;
 	}
 	$scope.delStar = function(s) {
 		s.colled = false;
-		$http.get(service + "exam/removeStudy?qid=" + s.qid);
+		$http.get(service + "exam/removeStudy?clcid=" + s.clcid);
 	}
 })
 
@@ -1007,19 +1038,37 @@ base.controller('fav', function($scope, $http, $sce, fac, user, hash) {
 	})
 	$scope.vote = fac.vote;
 	$scope.pen = fac.pen;
+	$scope.nlist = [{
+		type: "1",
+		name: "章节练习"
+	}, {
+		type: "4",
+		name: "学习计划"
+	}];
+	$scope.rt = hash.init({
+		type: $scope.nlist[0].type
+	});
 	$scope.rows = 20;
 	$scope.page = {};
 	$scope.loading = false;
+	var typeStr = "&type=" + $scope.rt.type;
 
 	$scope.html = function(s) {
 		return $sce.trustAsHtml(s);
 	}
+	$scope.setType = function(type) {
+		if (type && $scope.rt.type != type) {
+			$scope.rt.type = type;
+			typeStr = "&type=" + type;
+			$scope.get(1, true);
+		}
+	};
 	$scope.get = function(i, b) {
 		if (b || i != $scope.page.index) {
 			$scope.list = [];
 			$scope.loading = true;
 			$scope.page.index = i;
-			$http.post(service + "exam/getMyStudyCollQuestion?page=" + $scope.page.index + "&rows=" + $scope.rows + "&mid=" + user.info.mid + "&cid=" + user.info.cid)
+			$http.post(service + "exam/getMyStudyCollQuestion?page=" + $scope.page.index + "&rows=" + $scope.rows + "&mid=" + user.info.mid + "&cid=" + user.info.cid + typeStr)
 				.then(function(r) {
 					$scope.loading = false;
 					if (r.data.code == 200) {
@@ -1036,7 +1085,7 @@ base.controller('fav', function($scope, $http, $sce, fac, user, hash) {
 	}
 	$scope.delStar = function(s) {
 		s.colled = false;
-		$http.get(service + "exam/removeStudy?qid=" + s.qid)
+		$http.get(service + "exam/removeStudy?clcid=" + s.clcid)
 			.then(function() {
 				$scope.get($scope.page.index, true);
 			});
@@ -1139,8 +1188,7 @@ base.controller('item', function($scope, $http, $timeout, $sce, fac, user, hash)
 							})
 							adde = false;
 						}
-					} else
-						alert(r.data.msg)
+					}
 				});
 		}
 	}
@@ -1218,7 +1266,6 @@ base.controller('item', function($scope, $http, $timeout, $sce, fac, user, hash)
 					user.pay(r.data);
 				} else {
 					$scope.paying = "";
-					alert(r.data.msg);
 				}
 			});
 	}
@@ -1353,12 +1400,10 @@ base.controller('news', function($scope, $http, $sce, user, hash, fac) {
 	if ($scope.rt.id)
 		$http.get(service + "webuser/getNewsByid?nid=" + $scope.rt.id)
 		.then(function(r) {
-			if (r.data.code == 200) {
+			if (r.data.code == 200)
 				$scope.info = r.data.list[0];
-			} else {
-				alert(r.data.msg)
+			else
 				location.href = '<!--#echo var="wc1"-->user/news.html'
-			}
 		})
 })
 
@@ -1407,11 +1452,8 @@ base.controller('home', function($scope, $http, user, fac) {
 			.then(function(r) {
 				if (r.data.code == 200)
 					user.pay(r.data);
-				else {
-					alert(r.data.msg);
-					if (r.data.code == -2)
+				else if (r.data.code == -2)
 						location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx727973ddd3d1c2fb&redirect_uri=http%3A%2F%2Fwx.zkjan.com%2Fkstk-api%2Fwxuser%2FgetToken?&response_type=code&scope=snsapi_userinfo&state=h_' + encodeURIComponent(location.href) + '#wechat_redirect'
-				}
 			});
 	}
 })

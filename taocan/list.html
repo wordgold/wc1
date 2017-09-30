@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>学习套餐</title>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="taocan" class="ng-init">
+	<!--#include virtual="/include/nav.html"-->
+	<div ng-if="rt.type==1&&list.length">
+		<ul class="ol_qlist qlist panel" ng-repeat="s in list">
+			<h3 class="h3"><i class="i_video"></i>{{s.name}}</h3>
+			<li class="li" ng-repeat="g in s.jdlist" ng-class="{'on':g.showList}">
+				<div ng-click="show(g,s.id)">
+					<i ng-show="!g.showList" class="i_control_point gray"></i>
+					<i ng-show="g.showList" class="i_remove_point blue"></i>
+					<b>第 {{$index | xyz}} 阶段：</b>观看视频
+				</div>
+				<ol>
+					<hr>
+					<li class="li" ng-repeat="f in g.list" ng-init="download=f.name.indexOf('仅课件')==0">
+						<i class="i_circle"></i>
+						<content ng-if="!download">
+						<a ng-href="<!--#echo var="wc1"-->study/item.html?mid={{f.major_id}}&cid={{f.course_id}}&gid={{f.gid}}&vid={{f.id}}"><i class="i_play"></i> {{f.name}}</a><br>
+						<span class="gray">观看进度：</span><i class="i_bar"><u class="a" ng-style="{width:f.current_time/f.total_time*100+'%'}"></u></i>
+						<span style="margin-left: 9px"><a ng-if="f.ppt_url" ng-href="{{f.ppt_url}}" target="_blank"><i class="i_download"></i> 查看课件</a></span>
+						</content>
+						<a ng-if="download" ng-href="{{f.ppt_url}}"><i class="i_download"></i> {{f.name}}</a>
+					</li>
+				</ol>
+			</li>
+		</ul>
+	</div>
+	<div ng-if="rt.type==2&&list.length">
+		<ul class="ol_qlist qlist panel" ng-repeat="s in list">
+			<h3 class="h3"><i class="i_qlist"></i>{{s.name}}</h3>
+			<li class="li" ng-repeat="g in s.jdlist" ng-class="{'on':g.showList}">
+				<div ng-click="show(g,s.id)">
+					<i ng-if="!g.showList" class="i_control_point gray"></i>
+					<i ng-if="g.showList" class="i_remove_point blue"></i>
+					<b>第 {{$index | xyz}} 阶段：</b>练习试题
+				</div>
+				<ol>
+					<hr>
+					<a class="li" ng-repeat="e in g.list" ng-init="e.p=e.zdnums/e.yznums" ng-href="<!--#echo var="wc1"-->study/test.html?type=grade&sid={{e.id}}&name={{e.title}}">
+						<i class="i_circle"></i>
+						{{e.title}}<br>
+						<span class="gray">答题进度：</span><i class="i_bar"><u ng-class="{'a':e.p>0.84,'b':e.p>0.69,'c':e.p>0.49}" ng-style="{width:e.yznums/e.nums*100+'%'}"></u></i>
+						<span class="gray">题量：{{e.nums}}</span>
+					</a>
+				</ol>
+			</li>
+		</ul>
+	</div>
+	<div ng-if="rt.type==3&&list.length" class="qlist panel">
+		<a class="li" href="<!--#echo var="wc1"-->taocan/pic.html?id={{s.id}}" ng-repeat="s in list"><i class="i_download"></i> {{s.name}} </a>
+	</div>
+	<div class="none gray" ng-show="!loading&&!list.length">
+		暂无内容
+	</div>
+</div>
+<!--#include virtual="/include/footer.html"-->
+<script>
+	base.controller('taocan', function($scope, $http, fac, user, hash) {
+		$scope.nlist = [{
+			name: "观看视频",
+			type: 1
+		}, {
+			name: "练习试题",
+			type: 2
+		}];
+		user.bind(function() {
+			if(user.info.gmtc==1)
+				$scope.nlist = [{
+					name: "考点资料",
+					type: 3
+				}]
+			else if(user.info.gmtc==3)
+				$scope.nlist.push({
+					name: "考点资料",
+					type: 3
+				})
+			else if(user.info.gmtc==0)
+				location.href='show.html';
+			$scope.rt = hash.init({
+				type: $scope.nlist[0].type
+			});
+			$scope.get();
+		})
+
+		$scope.loading = true;
+
+		$scope.setType = function(type) {
+			if ($scope.rt.type != type) {
+				$scope.rt.type = type;
+				$scope.get();
+			}
+		};
+
+		$scope.show = function(q, gid) {
+			q.showList = !q.showList;
+			if (q.showList && !q.list) {
+				$http.post(service + "webuser/getMy" + ($scope.rt.type == 2 ? "GradeExamOrder" : "PlanGradeOrder") + "?type=2&gid=" + gid + "&order_id=" + q.order_id)
+					.then(function(r) {
+						if (r.data.code == 200) {
+							q.list = r.data.list;
+						}
+					});
+			}
+		}
+
+		$scope.get = function(i, b) {
+			$scope.list = [];
+			$scope.loading = true;
+			if($scope.rt.type == 3){
+				$http.post(service + "webuser/getMyGradeMaterial?rows=99&gid=184&mid=" + user.info.mid + "&cid=" + user.info.cid)
+					.then(function(r) {
+						$scope.loading = false;
+						if (r.data.code == 200) {
+							$scope.list = r.data.list;
+						}
+					});
+			}else{
+				$http.post(service + "webuser/getMy" + ($scope.rt.type == 2 ? "GradeExam" : "PlanGrade") + "?type=2&rows=99&mid=" + user.info.mid + "&cid=" + user.info.cid)
+					.then(function(r) {
+						$scope.loading = false;
+						if (r.data.code == 200) {
+							$scope.list = r.data.list;
+							for (var i = $scope.list.length; i--;) {
+								if (!$scope.list[i].jdlist.length)
+									$scope.list.splice(i, 1)
+							}
+						}
+					});
+			}
+		}
+	})
+</script>
+</body>
+</html>

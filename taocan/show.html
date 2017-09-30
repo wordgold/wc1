@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/include/head.html"-->
+	<title>学习套餐</title>
+	<style type="text/css">
+		.c1,.c2,.c3{
+			display: block;
+			position: absolute;
+			left: 103px;
+			top: 1398px;
+			width: 125px;
+			height: 35px;
+			background-size: 100% 100%;
+		}
+		.c2{
+			top:2250px;
+		}
+		.c3{
+			top:2498px;
+		}
+	</style>
+</head>
+<body ng-app="baseApp">
+<!--#include virtual="/include/header.html"-->
+<div ng-controller="taocan" class="ng-init panel news" style="width: 340px;margin: 0 auto;padding: 0">
+<img src="<!--#echo var='wc1'-->images/taocan/bg.jpg" style="display:block;width:340px;margin:0 auto;">
+<a href="javascript:" ng-click="pay('184')" class="c1"></a>
+<a href="javascript:" ng-click="pay('185')" class="c2"></a>
+<a href="javascript:" ng-click="pay('184,185')" class="c3"></a>
+<div ng-show="aShow" class="alert">
+	<form class="r_panel" ng-submit="sub()" name="ads" novalidate>
+		<h3 class="h3">请输入学习资料邮寄地址</h3>
+		<ul class="form">
+			<li class="no_f red">{{errMsg}}</li>
+			<li class="li"><input type="text" class="txt" ng-model="name" name="name" required placeholder="收件人姓名" style="text-align: left"></li>
+			<li class="li"><input type="text" class="txt" ng-model="phone" vphone name="phone" required placeholder="收件人电话" style="text-align: left"></li>
+			<li class="li"><textarea style="line-height: 20px;height: 99px" class="txt" ng-model="address" name="address" required placeholder="详细收件地址"></textarea></li>
+		</ul>
+		<div class="btns">
+			<label class="b_btn" ng-click="aShow=false">关 闭</label>
+			<label class="bg_red b_btn"><button type="submit" ng-disabled="ads.$invalid">提交</button></label>
+		</div>
+	</form>
+</div>
+</div>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<!--#include virtual="/include/footer.html"-->
+<script>
+	base.controller('taocan', function($scope, $http, $sce, user, fac, hash) {
+		$scope.user = user;
+		user.need = false;
+		user.title = "学习套餐";
+		fac.share("学习套餐-中科建安");
+
+		$http.post(service + "wxuser/checkUserinfo")
+			.then(function(r) {
+				if (r.data.code == 200) {
+					$http.post(service + "wxuser/checkUserPw")
+						.then(function(r) {
+							if (r.data.code == -1)
+								$scope.href = '<!--#echo var="wc1"-->password.html?href=' + encodeURIComponent(location.href);
+						});
+				} else
+					$scope.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx727973ddd3d1c2fb&redirect_uri=http%3A%2F%2Fwx.zkjan.com%2Fkstk-api%2Fwxuser%2FgetToken?&response_type=code&scope=snsapi_userinfo&state=hxh' + encodeURIComponent(location.pathname + location.search) + '#wechat_redirect'
+			});
+
+		$scope.pay = function(s){
+			if($scope.href)
+				location.href = $scope.href
+			else{
+				$scope.gids = s;
+				if(s==185){
+					$http.post(service + "gradeFront/addPackage?gids=" + $scope.gids).then(function(r) {
+						if (r.data.code == 200)
+							$http.post(service + "wxuser/wxReplaypay?id=" + r.data.orderid).then(function(r) {
+								if (r.data.code == 200) {
+									user.pay(r.data);
+								}
+							});
+						else
+							alert(r.data.msg)
+					});
+				}else{
+					$scope.aShow = true;
+				}
+			}
+		}
+		$scope.sub = function(){
+			$scope.errMsg = "正在提交，请稍候..."
+			$http.post(service + "gradeFront/addPackage","gids=" + $scope.gids + "&" +fac.serialize($scope.ads)).then(function(r) {
+				if (r.data.code == 200)
+					$http.post(service + "wxuser/wxReplaypay?id=" + r.data.orderid).then(function(r) {
+						if (r.data.code == 200) {
+							user.pay(r.data);
+						}
+					});
+				else
+					$scope.errMsg=r.data.msg
+			});
+		}
+	})
+</script>
+</body>
+</html>
