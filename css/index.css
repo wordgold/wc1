@@ -1102,17 +1102,17 @@ header .i_menu{
 /*home s*/
 .home_nav{
 	text-align: center;
-	height: 224px;
+	height: 118px;
 }
 .home_nav a{
 	display: block;
 	float: left;
-	width: 28%;
+	width: 22.5%;
 	height: 99px;
 	background: #fdc7be;
 	color: #333;
 	font-size: 14px;
-	margin: 9px 0 0 4%;
+	margin: 9px 0 0 2%;
 }
 .home_nav img{
 	display: block;
