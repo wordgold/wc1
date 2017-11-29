@@ -451,11 +451,22 @@ base.controller('newslist', function($scope, $http, user, fac) {
 				$scope.date = r.data.list[0].days.toString().split("");
 			}
 		});
-	$scope.page = 1;
-	$scope.next = true;
-	$scope.list = new Array();
+	$scope.nlist = [{
+		name: '地方资讯',
+		type: 6
+	}, {
+		name: '行业热点',
+		type: 3
+	}, {
+		name: '专题报道',
+		type: 7
+	}, {
+		name: '法律法规',
+		type: 4
+	}];
+
 	$scope.get = function() {
-		$http.post(service + "frontIndex/getHomeInfomation?type=1&rows=20&page=" + $scope.page)
+		$http.post(service + "frontIndex/getHomeInfomation?type=" + $scope.rt.type + "&rows=20&page=" + $scope.page)
 			.then(function(r) {
 				if (r.data.code == 200) {
 					$scope.list = $scope.list.concat(r.data.list);
@@ -465,7 +476,17 @@ base.controller('newslist', function($scope, $http, user, fac) {
 				}
 			});
 	}
-	$scope.get();
+	$scope.setType = function(type) {
+		if (type && $scope.rt.type != type) {
+			$scope.rt.type = type;
+			$scope.page = 1;
+			$scope.next = true;
+			$scope.list = new Array();
+			$scope.get(1, true);
+		}
+	};
+	$scope.rt = {};
+	$scope.setType(6)
 })
 
 base.controller('newsitem', function($scope, $http, $sce, user, fac, hash) {
@@ -1453,7 +1474,7 @@ base.controller('home', function($scope, $http, user, fac) {
 				if (r.data.code == 200)
 					user.pay(r.data);
 				else if (r.data.code == -2)
-						location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx727973ddd3d1c2fb&redirect_uri=http%3A%2F%2Fwx.zkjan.com%2Fkstk-api%2Fwxuser%2FgetToken?&response_type=code&scope=snsapi_userinfo&state=h_' + encodeURIComponent(location.href) + '#wechat_redirect'
+					location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx727973ddd3d1c2fb&redirect_uri=http%3A%2F%2Fwx.zkjan.com%2Fkstk-api%2Fwxuser%2FgetToken?&response_type=code&scope=snsapi_userinfo&state=h_' + encodeURIComponent(location.href) + '#wechat_redirect'
 			});
 	}
 })

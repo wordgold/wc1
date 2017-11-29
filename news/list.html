@@ -9,6 +9,7 @@
 	<header class="ng-init">
 		<h1>距离考试还有 <span class="newsdate" ng-repeat="i in date track by $index">{{i}}</span> 天</h1>
 	</header>
+	<!--#include virtual="/include/nav.html"-->
 	<div class="dlist panel" ng-if="list.length">
 		<a class="li" ng-repeat="s in list" ng-if="!s.glist" ng-href="<!--#echo var="wc1"-->news/item.html?id={{s.id}}">
 			<img ng-src="{{s.pic_url}}">
